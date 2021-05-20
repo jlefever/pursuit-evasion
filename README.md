@@ -1,4 +1,4 @@
-# arty
+# AGT
 
 ## CLI Commands
 *   `npm install`: Installs dependencies

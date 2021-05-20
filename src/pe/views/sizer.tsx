@@ -10,7 +10,7 @@ class Sizer extends Component<SizerProps> {
 
     componentDidMount() {
         if (!this.props.setSize) return;
-        const box = this.ref?.current?.getBBox();
+        const box = this.ref?.current?.getBoundingClientRect();
         if (!box) return;
         this.props.setSize(box.width, box.height);
     }
