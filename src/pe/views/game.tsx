@@ -11,7 +11,7 @@ interface GameState {
 class Game extends Component<{}, GameState> {
     constructor() {
         super();
-        this.state = { width: 0, height: 600 };
+        this.state = { width: 0, height: 595 };
     }
 
     setSize = (width: number, height: number) => {
@@ -22,8 +22,8 @@ class Game extends Component<{}, GameState> {
         const { width, height } = this.state;
         return (<Sizer setSize={this.setSize}>
             <svg id="my-svg" width="100%" height={height}>
-                <Grid width={width} height={height} hCells={12} vCells={9} />
-                <Circle cx={400} cy={300} r={20} />
+                <Grid width={width} height={height} hCells={13} vCells={8} />
+                <Circle cx={400} cy={300} r={15} />
             </svg>
         </Sizer>)
     }
