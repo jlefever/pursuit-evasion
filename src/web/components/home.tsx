@@ -1,5 +1,6 @@
 import { h, Fragment } from "preact";
 import Game from "../../pe/views/game";
+import Game2 from "../../pe/views/game2";
 
 function Home(props: { path: string }) {
     return <div class="section">
@@ -17,7 +18,7 @@ function Home(props: { path: string }) {
             <div class="columns">
                 <div class="column is-three-quarters">
                     <div class="box">
-                        <Game />
+                        <Game2 width={962} height={595} />
                     </div>
                 </div>
                 <div class="column">

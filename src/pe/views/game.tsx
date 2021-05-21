@@ -2,6 +2,7 @@ import { h, Component } from "preact";
 import Circle from "./circle";
 import Sizer from "./sizer";
 import Grid from "./grid";
+import { Board } from "../model"
 
 interface GameState {
     width: number;
