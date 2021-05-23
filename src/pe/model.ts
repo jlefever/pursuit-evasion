@@ -1,10 +1,4 @@
-import { createContext } from "preact";
-
-const { sin, cos, pow, atan2, sqrt, PI, acos, exp, abs } = Math;
-
-const square = (x: number) => pow(x, 2);
-
-type Pos = [number, number];
+const { acos, atan2, cos, PI, random, sin, sqrt } = Math;
 
 class Vec2 {
     private readonly _x: number;
@@ -28,7 +22,7 @@ class Vec2 {
     }
 
     get length() {
-        return sqrt(square(this.x) + square(this.y));
+        return sqrt(this.dot(this));
     }
 
     static car(x: number, y: number) {
@@ -67,7 +61,7 @@ class Vec2 {
 
     dot = (...vecs: Vec2[]) => Vec2.dot(this, ...vecs);
 
-    rotate = (angle: number) => Vec2.pol(addRad(this.angle, angle), this.length);
+    rotate = (angle: number) => Vec2.pol(addRadians(this.angle, angle), this.length);
 
     rotateTo = (angle: number) => Vec2.pol(angle, this.length);
 
@@ -90,10 +84,6 @@ interface Drawable {
     draw(ctx: Context): void;
 }
 
-interface Path {
-    toPath2D(): Path2D;
-}
-
 interface Fill {
     readonly fillStyle: string;
 }
@@ -103,85 +93,84 @@ interface Stroke {
     readonly lineWidth: number;
 }
 
-class Circle implements Path {
-    public readonly pos: Vec2;
-    public readonly radius: number;
-    private readonly _p: Path2D;
-
-    constructor(pos: Vec2, radius: number) {
-        this.pos = pos;
-        this.radius = radius;
-        this._p = new Path2D();
-        this._p.ellipse(pos.x, pos.y, radius, radius, 0, 0, 2 * PI);
-    }
-
-    toPath2D() {
-        return this._p;
-    }
+function addRadians(...rads: number[]) {
+    return rads.reduce((a, b) => a + b, 0) % (2 * PI);
 }
 
-class Grid implements Path {
-    public readonly pos: Pos;
-    public readonly size: Pos;
-    public readonly cellCount: Pos;
-
-    constructor(pos: Pos, size: Pos, cellCount: Pos) {
-        this.pos = pos;
-        this.size = size;
-        this.cellCount = cellCount;
-    }
-
-    toPath2D() {
-        const root = new Path2D();
-
-        const cellW = this.size[0] / this.cellCount[0];
-        const cellH = this.size[1] / this.cellCount[1];
-
-        for (let i = 0; i < this.size[0]; i++) {
-            const x = i * cellW;
-            const line = new Path2D();
-            line.moveTo(x, 0);
-            line.lineTo(x, this.size[1]);
-            root.addPath(line);
-        }
-
-        for (let i = 0; i < this.size[1]; i++) {
-            const y = i * cellH;
-            const line = new Path2D();
-            line.moveTo(0, y);
-            line.lineTo(this.size[0], y);
-            root.addPath(line);
-        }
-
-        return root;
-    }
+function circle(pos: Vec2, radius: number): Path2D {
+    const path = new Path2D();
+    path.ellipse(pos.x, pos.y, radius, radius, 0, 0, 2 * PI);
+    return path;
 }
 
-class Shape implements Drawable {
-    readonly path: Path;
-    readonly fill: Fill | undefined;
-    readonly stroke: Stroke | undefined;
+function arrow(pos: Vec2, sideLength: number): Path2D {
+    const path = new Path2D();
+    path.moveTo(pos.x, pos.y);
+    path.lineTo(sideLength, 0);
+    path.lineTo(sideLength, sideLength);
+    return path;
+}
 
-    constructor(path: Path, fill?: Fill, stroke?: Stroke) {
-        this.path = path;
-        this.fill = fill;
-        this.stroke = stroke;
+function grid(size: Vec2, width: number, height: number): Path2D {
+    const cellW = width / size.x;
+    const cellH = height / size.y;
+
+    const root = new Path2D();
+
+    for (let i = 0; i <= size.x; i++) {
+        const x = i * cellW;
+        const line = new Path2D();
+        line.moveTo(x, 0);
+        line.lineTo(x, height);
+        root.addPath(line);
     }
 
-    draw(ctx: Context) {
+    for (let i = 0; i <= size.y; i++) {
+        const y = i * cellH;
+        const line = new Path2D();
+        line.moveTo(0, y);
+        line.lineTo(width, y);
+        root.addPath(line);
+    }
+
+    return root;
+}
+
+function draw(ctx: Context, path: Path2D, fill?: Fill, stroke?: Stroke) {
+    if (fill || stroke) {
         ctx.beginPath();
-
-        if (this.fill) {
-            ctx.fillStyle = this.fill.fillStyle;
-            ctx.fill(this.path.toPath2D());
-        }
-
-        if (this.stroke) {
-            ctx.strokeStyle = this.stroke.strokeStyle;
-            ctx.lineWidth = this.stroke.lineWidth;
-            ctx.stroke(this.path.toPath2D());
-        }
     }
+
+    if (fill) {
+        ctx.fillStyle = fill.fillStyle;
+        ctx.fill(path);
+    }
+
+    if (stroke) {
+        ctx.strokeStyle = stroke.strokeStyle;
+        ctx.lineWidth = stroke.lineWidth;
+        ctx.stroke(path);
+    }
+}
+
+function drawArrow(ctx: Context, pos: Vec2, dir: number, radius: number, sideLength: number) {
+    ctx.save();
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.translate(pos.x, pos.y);
+    ctx.rotate(dir);
+    ctx.translate(radius, 0);
+    ctx.rotate(PI / 4);
+    ctx.moveTo(-sideLength, 0);
+    ctx.lineTo(0, 0);
+    ctx.lineTo(0, sideLength);
+    ctx.stroke();
+    ctx.restore();
+}
+
+interface AgentStyle {
+    fill: Fill;
+    stroke: Stroke;
 }
 
 abstract class Agent implements Updatable {
@@ -199,28 +188,19 @@ abstract class Agent implements Updatable {
     }
 
     abstract getDirection(): number;
-    abstract getStroke(): Stroke;
-    abstract getFill(): Fill;
+    abstract getStyle(): AgentStyle;
 }
-
-const addRad = (...rads: number[]) => (rads.reduce((a, b) => a + b, 0)) % (2 * PI);
-
-// 
-const argFact = (compareFn: any) => (array: any) => array.map((el: any, idx: any) => [el, idx]).reduce(compareFn)[1]
-const argMax = argFact((min: any, el: any) => (el[0] > min[0] ? el : min))
-const argMin = argFact((max: any, el: any) => (el[0] < max[0] ? el : max))
 
 class CAgent extends Agent {
     getDirection() {
         return this.vel.rotate(0.01 * PI).angle;
     }
 
-    getStroke() {
-        return { strokeStyle: "#68BA93", lineWidth: 3 };
-    }
-
-    getFill() {
-        return { fillStyle: "#7EE0B1" };
+    getStyle() {
+        return {
+            fill: { fillStyle: "#7EE0B1" },
+            stroke: { strokeStyle: "#68BA93", lineWidth: 3 }
+        };
     }
 }
 
@@ -229,12 +209,11 @@ class LAgent extends Agent {
         return this.vel.angle;
     }
 
-    getStroke() {
-        return { strokeStyle: "#68BA93", lineWidth: 3 };
-    }
-
-    getFill() {
-        return { fillStyle: "#7EE0B1" };
+    getStyle() {
+        return {
+            fill: { fillStyle: "#7EE0B1" },
+            stroke: { strokeStyle: "#68BA93", lineWidth: 3 }
+        };
     }
 }
 
@@ -246,55 +225,33 @@ class PAgent extends Agent {
     }
 
     getDirection() {
-        // return this.target!.pos.sub(this.pos).angle;
         return this.pos.lookAt(this.target!.pos).angle;
     }
 
-    getStroke() {
-        return { strokeStyle: "#67A1BD", lineWidth: 3 };
+    getStyle() {
+        return {
+            fill: { fillStyle: "#79BEE0" },
+            stroke: { strokeStyle: "#67A1BD", lineWidth: 3 }
+        };
     }
-
-    getFill() {
-        return { fillStyle: "#79BEE0" };
-    }
-}
-
-function getClosestWallPos(me: Vec2) {
-    const l = Vec2.car(0, me.y);
-    const r = Vec2.car(962, me.y);
-    const t = Vec2.car(me.x, 0);
-    const b = Vec2.car(me.x, 595);
-
-    const min = argMin([me.dist(l), me.dist(r), me.dist(t), me.dist(b)]);
-    if (min == 0) return l;
-    if (min == 1) return r;
-    if (min == 2) return t;
-    if (min == 3) return b;
-    throw Error();
 }
 
 class EAgent extends Agent {
-    target: Agent | undefined;
-
-    setTarget(target: Agent) {
-        this.target = target;
-    }
+    target?: Vec2;
 
     getDirection() {
-        // const df = (-1 * exp(this.pos.x - 962)) + exp(0 - this.pos.x);
-        // const dg = (-1 * exp(this.pos.y - 595)) + exp(0 - this.pos.y);
-        // // const dg = exp(this.pos.y) - exp(595 - this.pos.y);
-        // return Vec2.car(df, dg).angle;
-
-        return this.pos.lookAt(getClosestWallPos(this.pos)).rotate(PI).angle;
+        if (!this.target || this.pos.dist(this.target) < 10) {
+            this.target = Vec2.car(random() * 962, random() * 595);
+        }
+        
+        return this.pos.lookAt(this.target).angle;
     }
 
-    getStroke() {
-        return { strokeStyle: "#BD875D", lineWidth: 3 };
-    }
-
-    getFill() {
-        return { fillStyle: "#E0A06E" };
+    getStyle() {
+        return {
+            fill: { fillStyle: "#E0A06E" },
+            stroke: { strokeStyle: "#BD875D", lineWidth: 3 }
+        };
     }
 }
 
@@ -311,15 +268,14 @@ class Board implements Drawable, Updatable {
 
         const eva = new EAgent(Vec2.car(250, 250), Vec2.pol(0, 2));
         const per = new PAgent(Vec2.car(700, 400), Vec2.pol(0, 1.4));
-        // const dummy = new CAgent(Vec2.car(140, 140), Vec2.pol(0, 1));
-        const dummy2 = new LAgent(Vec2.car(140, 140), Vec2.pol(0.5 * PI, 1));
+        const dummy = new CAgent(Vec2.car(140, 140), Vec2.pol(0, 1));
+        // const dummy2 = new LAgent(Vec2.car(140, 140), Vec2.pol(0.5 * PI, 1));
 
-        eva.setTarget(dummy2);
-        per.setTarget(dummy2);
+        per.setTarget(eva);
 
         this.agents.push(eva);
-        // this.agents.push(per);
-        this.agents.push(dummy2);
+        this.agents.push(per);
+        this.agents.push(dummy);
     }
 
     update() {
@@ -327,19 +283,20 @@ class Board implements Drawable, Updatable {
     }
 
     draw(ctx: Context) {
-        ctx.save();
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        // ctx.save();
+        // ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, this.width, this.height);
-        ctx.restore();
+        // ctx.restore();
 
         // draw grid
-        const stroke = { strokeStyle: "#BDBDBD", lineWidth: 0.75 };
-        const grid = new Grid([0, 0], [this.width, this.height], [26, 16]);
-        new Shape(grid, undefined, stroke).draw(ctx);
+        const g = grid(Vec2.car(26, 16), this.width, this.height);
+        draw(ctx, g, undefined, { strokeStyle: "#BDBDBD", lineWidth: 0.75 })
 
         // draw agents
         this.agents.forEach(a => {
-            new Shape(new Circle(a.pos, 15), a.getFill(), a.getStroke()).draw(ctx);
+            const style = a.getStyle();
+            draw(ctx, circle(a.pos, 15), style.fill, style.stroke);
+            drawArrow(ctx, a.pos, a.vel.angle, 28, 8);
         });
     }
 }

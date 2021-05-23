@@ -16,25 +16,27 @@ class Game2 extends Component<Game2Props, Game2State> {
     ref: RefObject<HTMLCanvasElement>;
     board: Board;
     lastUpdate: number;
+    context: CanvasRenderingContext2D | null;
 
     constructor(props: Game2Props) {
         super(props);
         this.ref = createRef();
         this.board = new Board(this.props.width, this.props.height);
         this.lastUpdate = 0;
+        this.context = null;
         this.mainLoop = this.mainLoop.bind(this);
         this.state = { value: "" };
     }
 
     componentDidMount() {
+        this.context = this.ref.current!.getContext("2d");
         this.lastUpdate = performance.now();
         this.mainLoop();
     }
 
     mainLoop() {
         window.requestAnimationFrame(this.mainLoop);
-        const ctx = this.ref.current!.getContext("2d")!;
-        this.board.draw(ctx);
+        this.board.draw(this.context!);
         this.board.update();
 
         // this.setState({ value: JSON.stringify(this.board.agents, null, 2) });
