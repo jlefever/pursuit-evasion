@@ -1,4 +1,4 @@
-import { h, Component, createRef, RefObject, Fragment } from "preact";
+import { h, Component, createRef, RefObject } from "preact";
 import { Board } from "../model"
 
 interface Game2Props {
@@ -54,10 +54,10 @@ class Game2 extends Component<Game2Props, Game2State> {
 
     render() {
         const { width, height } = this.props;
-        return <>
+        return <div>
             <canvas ref={this.ref} width={width} height={height}></canvas>
             <pre>{this.state.value}</pre>
-        </>
+        </div>
     }
 }
 
