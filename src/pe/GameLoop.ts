@@ -47,6 +47,14 @@ export default class GameLoop {
         return this._isPlaying;
     }
 
+    public set playing(value: boolean) {
+        if (value) {
+            this.play();
+        } else {
+            this.pause();
+        }
+    }
+
     public toggle = () => {
         if (this._isPlaying) {
             this.pause();

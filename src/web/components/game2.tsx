@@ -5,6 +5,8 @@ import { Board } from "../../pe/model"
 interface Game2Props {
     width: number;
     height: number;
+    playing: boolean;
+    desiredUps: number;
 }
 
 interface Game2State {
@@ -30,13 +32,13 @@ class Game2 extends Component<Game2Props, Game2State> {
         this.gameLoop = new GameLoop(this.board.update, (_) => {
             if (!this.context) return;
             this.board.draw(this.context);
-        }, 70);
+        }, this.props.desiredUps);
     }
 
     componentDidMount() {
         console.log("mount");
         this.context = this.ref.current!.getContext("2d");
-        this.gameLoop.play();
+        this.gameLoop.playing = this.props.playing;
         this.timerId = setInterval(() => {
             this.setState({
                 fps: this.gameLoop.framesPerSecond,
@@ -50,8 +52,10 @@ class Game2 extends Component<Game2Props, Game2State> {
         clearInterval(this.timerId);
     }
 
-    componentDidUpdate(prevProps: any, prevState: any, snapshot: any) {
+    componentDidUpdate(prevProps: Game2Props, prevState: Game2State, snapshot: any) {
         this.context = this.ref.current!.getContext("2d");
+        this.gameLoop.playing = this.props.playing;
+        this.gameLoop.targetUps = this.props.desiredUps;
     }
 
     render() {
@@ -61,7 +65,7 @@ class Game2 extends Component<Game2Props, Game2State> {
         return <div>
             <canvas ref={this.ref} width={width} height={height}></canvas>
             <span class="pr-3 is-family-monospace">FPS: {round(this.state.fps)}</span>
-            <span class="is-family-monospace">UPS: {round(this.state.ups)}</span>
+            <span class="is-family-monospace">TPS: {round(this.state.ups)}</span>
         </div>
     }
 }

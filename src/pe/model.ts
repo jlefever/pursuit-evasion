@@ -488,7 +488,7 @@ class Board implements Drawable, Updatable {
 
         per.setTarget(dummy);
         per2.setTarget(dummy);
-        per3.setTarget(dummy);
+        per3.setTarget(eva);
         // eva.setTarget(per);
 
         this.agents.push(eva);
@@ -503,10 +503,7 @@ class Board implements Drawable, Updatable {
     }
 
     draw = (ctx: Context) => {
-        // ctx.save();
-        // ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, this.width, this.height);
-        // ctx.restore();
 
         // draw grid
         draw(ctx, this.grid.lines(), undefined, { strokeStyle: "#BDBDBD", lineWidth: 0.75 })
