@@ -474,8 +474,8 @@ class Board implements Drawable, Updatable {
         this.width = width;
         this.height = height;
         this.grid = new Grid(Vec2.car(26, 16), width, height);
-        this.grid.setTerrian(6, 6);
-        this.grid.setTerrian(6, 7);
+        // this.grid.setTerrian(6, 6);
+        // this.grid.setTerrian(6, 7);
 
         this.agents = [];
 
@@ -498,11 +498,11 @@ class Board implements Drawable, Updatable {
         this.agents.push(dummy);
     }
 
-    update() {
+    update = () => {
         this.agents.forEach(a => a.update());
     }
 
-    draw(ctx: Context) {
+    draw = (ctx: Context) => {
         // ctx.save();
         // ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, this.width, this.height);

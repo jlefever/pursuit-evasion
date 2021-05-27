@@ -1,6 +1,5 @@
 import { h, Fragment } from "preact";
-import Game from "../../pe/views/game";
-import Game2 from "../../pe/views/game2";
+import Game2 from "./game2";
 
 function Home(props: { path: string }) {
     return <div class="section">
