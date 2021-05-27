@@ -8,7 +8,6 @@ import Header from './header';
 function App() {
     return (
         <div id="preact_root">
-            <Header />
             <Router>
                 <Home path="/" />
                 <NotFoundPage default />

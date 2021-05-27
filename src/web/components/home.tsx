@@ -20,22 +20,186 @@ function Home(props: { path: string }) {
                     <div class="box">
                         <Game2 width={962} height={595} />
                     </div>
+                    <div class="box">
+                        <table class="table is-striped is-hoverable is-fullwidth">
+                            <thead>
+                                <tr>
+                                    <th>Agent</th>
+                                    <th>Team</th>
+                                    <th>Position</th>
+                                    <th>Velocity</th>
+                                    <th>Target</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>0</th>
+                                    <td>Evador</td>
+                                    <td>(0.4, 2)</td>
+                                    <td>(0.4, 2)</td>
+                                    <td>(0.4, 2)</td>
+                                </tr>
+                                <tr>
+                                    <th>1</th>
+                                    <td>Pursuer</td>
+                                    <td>(0.4, 2)</td>
+                                    <td>(0.4, 2)</td>
+                                    <td>(0.4, 2)</td>
+                                </tr>
+                                <tr>
+                                    <th>1</th>
+                                    <td>Pursuer</td>
+                                    <td>(0.4, 2)</td>
+                                    <td>(0.4, 2)</td>
+                                    <td>(0.4, 2)</td>
+                                </tr>
+                                <tr>
+                                    <th>1</th>
+                                    <td>Pursuer</td>
+                                    <td>(0.4, 2)</td>
+                                    <td>(0.4, 2)</td>
+                                    <td>(0.4, 2)</td>
+                                </tr>
+                                <tr>
+                                    <th>1</th>
+                                    <td>Pursuer</td>
+                                    <td>(0.4, 2)</td>
+                                    <td>(0.4, 2)</td>
+                                    <td>(0.4, 2)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <div class="column">
-                    <nav class="panel is-info" style="height: 100%">
-                        <p class="panel-heading">Options</p>
-                        <p class="panel-tabs">
-                            <a class="is-active">One</a>
-                            <a>Two</a>
-                            <a>Three</a>
-                        </p>
+                    <nav class="panel">
+                        <p class="panel-heading">Simulation</p>
                         <div class="panel-block">
-                            <p class="control has-icons-left">
-                                <input class="input" type="text" placeholder="Search" />
-                                <span class="icon is-left">
-                                    <i class="fas fa-search" aria-hidden="true"></i>
-                                </span>
-                            </p>
+                            <div class="field is-grouped" style="width: 100%">
+                                <p class="control is-expanded">
+                                    <button class="button is-fullwidth is-outlined is-link">
+                                        <span class="icon"><i class="fas fa-play"></i></span>
+                                    </button>
+                                </p>
+                                <p class="control">
+                                    <div class="select is-link">
+                                        <select>
+                                            <option>0.5</option>
+                                            <option selected>1.0</option>
+                                            <option>1.5</option>
+                                            <option>2.0</option>
+                                        </select>
+                                    </div>
+                                </p>
+                            </div>
+                        </div>
+                    </nav>
+                    <nav class="panel">
+                    <p class="panel-heading">Options</p>
+                        <div class="panel-block is-justify-content-center has-text-weight-semibold">
+                            Pursuers
+                        </div>
+
+                        <div class="panel-block">
+                            <div style="width: 100%">
+                                <div class="field">
+                                    <label class="label has-text-weight-light">Speed</label>
+                                    <div class="control">
+                                        <input class="slider has-output is-fullwidth mt-0 mb-0" step="1" min="1" max="360" value="50" type="range" />
+                                        <output >50&#176;</output>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel-block">
+                            <div style="width: 100%">
+                                <div class="field">
+                                    <label class="label has-text-weight-light">Turn Radius</label>
+                                    <div class="control">
+                                        <input class="slider has-output is-fullwidth mt-0 mb-0" step="1" min="0" max="100" value="50" type="range" />
+                                        <output >50</output>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel-block is-justify-content-center has-text-weight-semibold">
+                            Evaders
+                        </div>
+
+                        <div class="panel-block">
+                            <div style="width: 100%">
+                                <div class="field">
+                                    <label class="label has-text-weight-light">Speed</label>
+                                    <div class="control">
+                                        <input class="slider has-output is-fullwidth mt-0 mb-0" step="1" min="0" max="100" value="50" type="range" />
+                                        <output >50</output>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel-block">
+                            <div style="width: 100%">
+                                <div class="field">
+                                    <label class="label has-text-weight-light">Turn Radius</label>
+                                    <div class="control">
+                                        <input class="slider has-output is-fullwidth mt-0 mb-0" step="1" min="0" max="100" value="50" type="range" />
+                                        <output >50</output>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* <div class="panel-block">
+                            <div style="width: 100%">
+                                <div class="field">
+                                <label class="label has-text-weight-light is-small">Pursuer Speed</label>
+                                    <div class="control">
+                                    <input class="slider has-output is-fullwidth mt-0 mb-0" step="1" min="0" max="100" value="50" type="range" />
+                                        <output >50</output>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-block">
+                            <div style="width: 100%">
+                                <div class="field">
+                                <label class="label has-text-weight-light is-small">Pursuer Turn Radius</label>
+                                    <div class="control">
+                                        <input class="slider has-output is-fullwidth mt-0 mb-0" step="1" min="0" max="100" value="50" type="range" />
+                                        <output >50</output>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-block">
+                            <div style="width: 100%">
+                                <div class="field">
+                                    <label class="label has-text-weight-light is-small">Evader Speed</label>
+                                    <div class="control">
+                                    <input class="slider has-output is-fullwidth mt-0 mb-0" step="1" min="0" max="100" value="50" type="range" />
+                                        <output >50</output>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-block">
+                            <div style="width: 100%">
+                                <div class="field">
+                                <label class="label has-text-weight-light is-small">Pursuer Turn Radius</label>
+                                    <div class="control">
+                                    <input class="slider has-output is-fullwidth mt-0 mb-0" step="1" min="0" max="100" value="50" type="range" />
+                                        <output >50</output>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> */}
+                        <div class="panel-block">
+                            <button class="button is-link is-outlined is-fullwidth">
+                                Reset to Defaults
+                            </button>
                         </div>
                     </nav>
                 </div>
