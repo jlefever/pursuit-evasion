@@ -9,7 +9,7 @@ interface HomeState {
 class Home extends Component<{}, HomeState> {
     constructor() {
         super();
-        this.state = { playing: true, updatesPerSecond: 70 };
+        this.state = { playing: false, updatesPerSecond: 20 };
     }
 
     render() {
@@ -28,7 +28,7 @@ class Home extends Component<{}, HomeState> {
                 <div class="columns">
                     <div class="column is-three-quarters">
                         <div class="box">
-                            <Game2 width={962} height={595} playing={this.state.playing} desiredUps={this.state.updatesPerSecond} />
+                            <Game2 width={962} height={592} playing={this.state.playing} desiredUps={this.state.updatesPerSecond} />
                         </div>
                         <div class="box">
                             <table class="table is-striped is-hoverable is-fullwidth">

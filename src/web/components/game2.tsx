@@ -29,9 +29,9 @@ class Game2 extends Component<Game2Props, Game2State> {
         this.context = null;
         this.state = { value: "", fps: 0, ups: 0 };
 
-        this.gameLoop = new GameLoop(this.board.update, (_) => {
+        this.gameLoop = new GameLoop(this.board.update, (alpha) => {
             if (!this.context) return;
-            this.board.draw(this.context);
+            this.board.draw(this.context, alpha);
         }, this.props.desiredUps);
     }
 

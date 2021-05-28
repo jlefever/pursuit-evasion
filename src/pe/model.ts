@@ -1,3 +1,7 @@
+import FastMarcher from "./FastMarcher";
+import Mesh from "./Mesh";
+import Queue from "./Queue";
+
 const { acos, atan2, cos, PI, random, sin, sqrt } = Math;
 
 class Vec2 {
@@ -416,12 +420,12 @@ class Grid {
     cells: boolean[][];
 
     constructor(size: Vec2, width: number, height: number) {
-      this.size = size;
-      this.width = width;
-      this.height = height;
-      this.cellW = width / size.x
-      this.cellH = height / size.y
-      this.cells = new Array(size.x).fill(0).map(() => new Array(size.y).fill(0));
+        this.size = size;
+        this.width = width;
+        this.height = height;
+        this.cellW = width / size.x
+        this.cellH = height / size.y
+        this.cells = new Array(size.x).fill(0).map(() => new Array(size.y).fill(0));
     }
 
     setTerrian(i: number, j: number) {
@@ -443,7 +447,7 @@ class Grid {
 
     lines(): Path2D {
         const root = new Path2D();
-    
+
         for (let i = 0; i <= this.size.x; i++) {
             const x = i * this.cellW;
             const line = new Path2D();
@@ -451,7 +455,7 @@ class Grid {
             line.lineTo(x, this.height);
             root.addPath(line);
         }
-    
+
         for (let i = 0; i <= this.size.y; i++) {
             const y = i * this.cellH;
             const line = new Path2D();
@@ -459,51 +463,117 @@ class Grid {
             line.lineTo(this.width, y);
             root.addPath(line);
         }
-    
+
         return root;
     }
 }
 
-class Board implements Drawable, Updatable {
+interface FmmPoint {
+    i: number;
+    j: number;
+
+    readonly x1: number;
+    readonly y1: number;
+    readonly x2: number;
+    readonly y2: number;
+
+    reset: () => void;
+
+    ttr: number;
+}
+
+function rgb(r: number, g: number, b: number) {
+    return `rgb(${r},${g},${b})`;
+}
+
+function findMax(mesh: Mesh<FmmPoint>) {
+    let max = Number.NEGATIVE_INFINITY;
+
+    mesh.forEach(p => {
+        if (p.ttr == Number.POSITIVE_INFINITY) return;
+        if (p.ttr > max) max = p.ttr;
+    });
+
+    return max;
+}
+
+function drawMesh(ctx: Context, mesh: Mesh<FmmPoint>) {
+    ctx.save();
+
+    const max = findMax(mesh);
+
+    mesh.forEach(p => {
+        const scale = ((p.ttr / max) * 255);
+        ctx.fillStyle = rgb(scale, scale, scale);
+        ctx.fillRect(p.x1, p.y1, p.x2 - p.x1, p.y2 - p.y1);
+    });
+
+    ctx.restore();
+}
+
+function drawMeshToImage(mesh: Mesh<FmmPoint>, image: ImageData) {
+    const getIndices = (x: number, y: number) => {
+        const red = y * (image.width * 4) + x * 4;
+        return [red, red + 1, red + 2, red + 3];
+      };
+
+    const max = findMax(mesh);
+
+    for (let x = 0; x < image.width; x++) {
+        for (let y = 0; y < image.height; y++) {
+            const ttr = mesh.getByXY(x, y).ttr;
+            const scale = 255 * (ttr / max);
+
+            const [red, green, blue, alpha] = getIndices(x, y);
+            image.data[red] = scale;
+            image.data[green] = scale;
+            image.data[blue] = scale;
+            image.data[alpha] = 255;
+        }
+    }
+}
+
+class Board implements Updatable {
     public readonly agents: Agent[];
     public readonly width: number;
     public readonly height: number;
     public readonly grid: Grid;
+    private readonly _marcher: FastMarcher;
+    private readonly _image: ImageData;
 
     constructor(width: number, height: number) {
         this.width = width;
         this.height = height;
         this.grid = new Grid(Vec2.car(26, 16), width, height);
-        // this.grid.setTerrian(6, 6);
-        // this.grid.setTerrian(6, 7);
+        this._marcher = new FastMarcher({ width: this.width, height: this.height }, 37);
+        this._image = new ImageData(this.width, this.height);
 
         this.agents = [];
+        // const eva = new CAgent(Vec2.car(250, 250), Vec2.pol(0, 2));
+        // const per = new PAgent(Vec2.car(700, 400), Vec2.pol(0, 1.4));
+        // const per2 = new PAgent(Vec2.car(500, 400), Vec2.pol(0, 1.4));
+        // const per3 = new PAgent(Vec2.car(200, 400), Vec2.pol(0, 1.4));
+        // const dummy = new RAgent(Vec2.car(140, 140), Vec2.pol(0, 2));
+        // this.agents.push(dummy);
 
-        const eva = new CAgent(Vec2.car(250, 250), Vec2.pol(0, 2));
-        const per = new PAgent(Vec2.car(700, 400), Vec2.pol(0, 1.4));
-        const per2 = new PAgent(Vec2.car(500, 400), Vec2.pol(0, 1.4));
-        const per3 = new PAgent(Vec2.car(200, 400), Vec2.pol(0, 1.4));
-        const dummy = new RAgent(Vec2.car(140, 140), Vec2.pol(0, 2));
-        const dummy2 = new LAgent(Vec2.car(140, 140), Vec2.pol(0.5 * PI, 1));
-
-        per.setTarget(dummy);
-        per2.setTarget(dummy);
-        per3.setTarget(eva);
-        // eva.setTarget(per);
-
-        this.agents.push(eva);
-        this.agents.push(per);
-        this.agents.push(per2);
-        this.agents.push(per3);
-        this.agents.push(dummy);
+        const agent = new RAgent(Vec2.car(500, 400), Vec2.pol(0, 5));
+        this.agents.push(agent);
     }
 
     update = () => {
         this.agents.forEach(a => a.update());
+
+        const pos = this.agents[0].pos;
+        const speed = this.agents[0].vel.length;
+        this._marcher.march(pos.x, pos.y, speed);
+        // drawMeshToImage(this._marcher.mesh, this._image);
     }
 
-    draw = (ctx: Context) => {
+    draw = (ctx: Context, alpha: number) => {
         ctx.clearRect(0, 0, this.width, this.height);
+
+        drawMesh(ctx, this._marcher.mesh);
+        // ctx.putImageData(this._image, 0, 0);
 
         // draw grid
         draw(ctx, this.grid.lines(), undefined, { strokeStyle: "#BDBDBD", lineWidth: 0.75 })
@@ -512,14 +582,16 @@ class Board implements Drawable, Updatable {
         // draw agents
         this.agents.forEach(a => {
             const style = a.getStyle();
-            draw(ctx, circle(a.pos, 15), style.fill, style.stroke);
-            drawArrow(ctx, a.pos, a.vel.angle, 28, 8);
 
-            const intersection = getWallIntersection(a.pos, a.vel.angle);
+            const pos = a.pos.add(a.vel.scale(alpha));
+            draw(ctx, circle(pos, 15), style.fill, style.stroke);
+            drawArrow(ctx, pos, a.vel.angle, 28, 8);
+
+            const intersection = getWallIntersection(pos, a.vel.angle);
             ctx.save();
             ctx.lineWidth = 1;
             ctx.strokeStyle = "black";
-            drawLine(ctx, a.pos, intersection);
+            drawLine(ctx, pos, intersection);
             ctx.fillStyle = "red";
             ctx.fill(circle(intersection, 3));
             ctx.restore();
