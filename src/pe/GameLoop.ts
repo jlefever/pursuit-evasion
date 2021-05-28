@@ -1,4 +1,4 @@
-import Timer from "./Timer";
+import FreqTimer from "./FreqTimer";
 
 type UpdateFn = () => void;
 type RenderFn = (alpha: number) => void;
@@ -6,23 +6,18 @@ type RenderFn = (alpha: number) => void;
 export default class GameLoop {
     private readonly _update: UpdateFn;
     private readonly _render: RenderFn;
-    private _updateTimer: Timer;
-    private _renderTimer: Timer;
+    private _updateTimer: FreqTimer = new FreqTimer();
+    private _renderTimer: FreqTimer = new FreqTimer();
     private _lastFrameId: number = 0;
     private _targetUpdatesPerSecond: number = 0;
     private _targetMsPerUpdate: number = 0;
+    private _isPlaying: boolean = false;
     private _previous: number = 0;
     private _lag: number = 0;
-    private _isPlaying: boolean = false;
-
 
     public constructor(update: UpdateFn, render: RenderFn, targetUPS: number) {
         this._update = update;
         this._render = render;
-        this._updateTimer = new Timer();
-        this._renderTimer = new Timer();
-        this._isPlaying = false;
-
         this.targetUps = targetUPS;
     }
 
@@ -55,17 +50,8 @@ export default class GameLoop {
         }
     }
 
-    public toggle = () => {
-        if (this._isPlaying) {
-            this.pause();
-        } else {
-            this.play();
-        }
-    }
-
     public play = () => {
         if (this._isPlaying) return;
-        this.resetTimers();
         this._isPlaying = true;
         this._previous = performance.now();
         this.loop();
@@ -73,7 +59,6 @@ export default class GameLoop {
 
     public pause = () => {
         if (!this._isPlaying) return;
-        this.resetTimers();
         this._isPlaying = false;
         window.cancelAnimationFrame(this._lastFrameId);
     }
@@ -93,10 +78,5 @@ export default class GameLoop {
         this._renderTimer.tick();
         this._render(this._lag / this._targetMsPerUpdate);
         this._lastFrameId = window.requestAnimationFrame(this.loop);
-    }
-
-    private resetTimers = () => {
-        this._renderTimer.reset();
-        this._updateTimer.reset();
     }
 }
