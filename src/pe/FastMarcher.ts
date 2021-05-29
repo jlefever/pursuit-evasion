@@ -1,66 +1,10 @@
 import Environment from "./Environment";
+import FmmPoint from "./FmmPoint";
 import Mesh from "./Mesh";
-import MeshPoint from "./MeshPoint";
 import Queue from "./Queue";
 
-enum NodeLabel {
-    FAR = 0,
-    CONSIDERED = 1,
-    ACCEPTED = 2
-}
-
-class FmmPoint implements MeshPoint {
-    public static readonly DEFAULT_TTR = Number.POSITIVE_INFINITY;
-    public static readonly DEFAULT_LABEL = NodeLabel.FAR;
-
-    public readonly i: number;
-    public readonly j: number;
-    public readonly x1: number;
-    public readonly y1: number;
-    public readonly x2: number;
-    public readonly y2: number;
-    public ttr: number = FmmPoint.DEFAULT_TTR;
-    public label: NodeLabel = FmmPoint.DEFAULT_LABEL;
-
-    private constructor(i: number, j: number, x1: number, y1: number, x2: number, y2: number) {
-        this.i = i;
-        this.j = j;
-        this.x1 = x1;
-        this.y1 = y1;
-        this.x2 = x2;
-        this.y2 = y2;
-    }
-
-    public static create = (i: number, j: number, x1: number, y1: number, x2: number, y2: number) => {
-        return new FmmPoint(i, j, x1, y1, x2, y2);
-    }
-
-    public static prefered = (a: FmmPoint, b: FmmPoint) => {
-        return a.ttr < b.ttr;
-    }
-
-    public static equality = (a: FmmPoint, b: FmmPoint) => {
-        return Object.is(a, b);
-    }
-
-    public consider = (ttr: number) => {
-        this.label = NodeLabel.CONSIDERED;
-        this.ttr = Math.min(this.ttr, ttr);
-    }
-
-    public accept = () => {
-        this.label = NodeLabel.ACCEPTED;
-    }
-
-    public isAccepted = () => {
-        return this.label === NodeLabel.ACCEPTED;
-    }
-
-    public reset = () => {
-        this.ttr = FmmPoint.DEFAULT_TTR;
-        this.label = FmmPoint.DEFAULT_LABEL;
-    }
-}
+const {abs, min, pow, sqrt} = Math;
+const sq = (z: number) => pow(z, 2);
 
 export default class FastMarcher {
     private readonly _env: Environment;
@@ -81,7 +25,7 @@ export default class FastMarcher {
 
     public march = (x0: number, y0: number, speed: number) => {
         this._mesh.reset();
-        const init = this._mesh.getByXY(x0, y0);
+        const init = this._mesh.access(this._mesh.getI(x0), this._mesh.getJ(y0));
         init.consider(0);
         this._queue.push(init);
 
@@ -99,41 +43,32 @@ export default class FastMarcher {
         return available;
     }
 
-    private ttr = (point: FmmPoint, speed: number) => {
-        const a = this._mesh.get(point.i - 1, point.j).ttr;
-        const b = this._mesh.get(point.i + 1, point.j).ttr;
-        const c = this._mesh.get(point.i, point.j - 1).ttr;
-        const d = this._mesh.get(point.i, point.j + 1).ttr;
-        const uH = Math.min(a, b);
-        const uV = Math.min(c, d);
-        const h = this._stepSize;
-        const f = speed;
-        const stepPerSpeed = h / f;
+    private ttr = (p: FmmPoint, speed: number) => {
+        const get = (i: number, j: number) => this._mesh.access(i, j).ttr;
+        const uH = min(get(p.i - 1, p.j), get(p.i + 1, p.j));
+        const uV = min(get(p.i, p.j - 1), get(p.i, p.j + 1));
+        const time = this._stepSize / speed;
 
         // Lower-dimensional update
-        const diff = Math.abs(uH - uV);
-        if (diff >= stepPerSpeed) {
-            return Math.min(uH, uV) + stepPerSpeed;
-        }
+        if (abs(uH - uV) > time) return min(uH, uV) + time;
 
-        const sq = (z: number) => Math.pow(z, 2);
-
-        const underRad = sq(uH + uV) - 2 * (sq(uH) + sq(uV) - sq(stepPerSpeed));
-        return ((uH + uV) / 2) + 0.5 * Math.sqrt(underRad);
+        // Full update
+        const underRad = sq(uH + uV) - 2 * (sq(uH) + sq(uV) - sq(time));
+        return 0.5 * (uH + uV + sqrt(underRad));
     }
 
     private isInBounds = (i: number, j: number) => {
         const maxI = this._mesh.getI(this._env.width);
-        const maxJ = this._mesh.getI(this._env.height);
+        const maxJ = this._mesh.getJ(this._env.height);
         return i >= 0 && j >= 0 && i <= maxI && j <= maxJ;
     }
 
     private getReachableNeighbors = (p: FmmPoint) => {
         const arr = new Array<FmmPoint>();
-        if (this.isInBounds(p.i - 1, p.j)) arr.push(this._mesh.get(p.i - 1, p.j));
-        if (this.isInBounds(p.i + 1, p.j)) arr.push(this._mesh.get(p.i + 1, p.j));
-        if (this.isInBounds(p.i, p.j - 1)) arr.push(this._mesh.get(p.i, p.j - 1));
-        if (this.isInBounds(p.i, p.j + 1)) arr.push(this._mesh.get(p.i, p.j + 1));
+        if (this.isInBounds(p.i - 1, p.j)) arr.push(this._mesh.access(p.i - 1, p.j));
+        if (this.isInBounds(p.i + 1, p.j)) arr.push(this._mesh.access(p.i + 1, p.j));
+        if (this.isInBounds(p.i, p.j - 1)) arr.push(this._mesh.access(p.i, p.j - 1));
+        if (this.isInBounds(p.i, p.j + 1)) arr.push(this._mesh.access(p.i, p.j + 1));
         return arr;
     }
 }

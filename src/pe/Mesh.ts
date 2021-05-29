@@ -24,11 +24,7 @@ export default class Mesh<T extends MeshPoint> {
         return this._yStep;
     }
 
-    public getByXY = (x: number, y: number): T => {
-        return this.get(this.getI(x), this.getJ(y));
-    }
-
-    public get = (i: number, j: number): T => {
+    public access = (i: number, j: number): T => {
         if (!(i in this._arr)) {
             const inner = new Array<T>();
             this._arr[i] = inner;
@@ -63,14 +59,14 @@ export default class Mesh<T extends MeshPoint> {
     public reset = () => this.forEach((p => p.reset()));
 
     private static indexFor = (step: number, z: number) => {
-        const initial = z / step | 0;
+        const initial = (z / step) | 0;
         const offset = (z % step) / (0.5 * step) | 0
         return initial + offset;
     }
 
     private createPoint(i: number, j: number) {
-        const x1 = this._xStep * i;
-        const y1 = this._yStep * j;
+        const x1 = this.getX(i);
+        const y1 = this.getY(j);
         const x2 = x1 + this._xStep;
         const y2 = y1 + this._yStep;
         return this._createPoint(i, j, x1, y1, x2, y2);
