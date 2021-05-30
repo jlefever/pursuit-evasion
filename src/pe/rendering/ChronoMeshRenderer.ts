@@ -1,5 +1,5 @@
-import IChronoPoint from "../IChronoPoint";
-import IMesh from "../IMesh";
+import IMesh from "../grid/IMesh";
+import IChronoPoint from "../chrono/IChronoPoint";
 import MeshRenderer from "./MeshRenderer";
 
 export default class ChronoMeshRenderer<T extends IChronoPoint> extends MeshRenderer<T> {

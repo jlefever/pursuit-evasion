@@ -25,14 +25,18 @@ export default class GridLinesRenderer implements IRenderer {
 
         for (let i = 0; i <= this._numHCells; i++) {
             const x = i * this._cellSize;
+            ctx.beginPath();
             ctx.moveTo(x, 0);
             ctx.lineTo(x, this._height);
+            ctx.stroke();
         }
 
         for (let i = 0; i <= this._numVCells; i++) {
             const y = i * this._cellSize;
-            ctx.moveTo(y, 0);
-            ctx.lineTo(y, this._width);
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(this._width, y);
+            ctx.stroke();
         }
     }
 }

@@ -1,5 +1,5 @@
-import IMesh from "../IMesh";
-import IMeshPoint from "../IMeshPoint";
+import IMesh from "../grid/IMesh";
+import IMeshPoint from "../grid/IMeshPoint";
 import IRenderer from "./IRenderer";
 import IRenderingContext from "./IRenderingContext";
 
