@@ -43,6 +43,10 @@ export default class Car implements IDrivable, IVehicle {
         return this._topSpeed;
     }
 
+    public set topSpeed(value: number) {
+        this._topSpeed = value;
+    }
+
     public get heading() {
         return this._heading;
     }

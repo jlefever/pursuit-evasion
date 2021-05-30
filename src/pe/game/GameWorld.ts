@@ -7,11 +7,7 @@ import IGameWorld from "./IWorld";
 import IAgent from "../agency/IAgent";
 import IPhysics from "./IPhysics";
 import Victory from "./Victory";
-
-const PURSUER_TOP_SPEED = 8;
-const EVADER_TOP_SPEED = 8;
-const CAPTURE_DISTANCE = 2;
-const MAX_GAME_LENGTH = 20 * 30;
+import GameDefaults from "./GameDefaults";
 
 export default class GameWorld implements IGameWorld, IUpdatable {
     private readonly _physics: IPhysics;
@@ -19,7 +15,11 @@ export default class GameWorld implements IGameWorld, IUpdatable {
     private readonly _pursuers: Driver[];
     private readonly _evaders: Driver[];
     private _victory: Victory;
-    private _gameLength: number;
+    private _currGameLength: number;
+    private _topPursuerSpeed: number;
+    private _topEvaderSpeed: number;
+    private _captureDistance: number;
+    private _maxGameLength: number;
     
     public constructor(terrian: ITerrian, physics: IPhysics) {
         this._physics = physics
@@ -27,7 +27,12 @@ export default class GameWorld implements IGameWorld, IUpdatable {
         this._pursuers = [];
         this._evaders = [];
         this._victory = Victory.NOT_YET;
-        this._gameLength = 0;
+        this._currGameLength = 0;
+
+        this._topPursuerSpeed = GameDefaults.TOP_PURSUER_SPEED
+        this._topEvaderSpeed = GameDefaults.TOP_EVADER_SPEED;
+        this._captureDistance = GameDefaults.CAPTURE_DISTANCE;
+        this._maxGameLength = GameDefaults.MAX_GAME_LENGTH;
     }
 
     public get terrian() {
@@ -46,15 +51,49 @@ export default class GameWorld implements IGameWorld, IUpdatable {
         return this._victory;
     }
 
+    public get topPursuerSpeed() {
+        return this._topPursuerSpeed;
+    }
+
+    public set topPursuerSpeed(value: number) {
+        this._topPursuerSpeed = value;
+        this._pursuers.forEach(p => p.vehicle.topSpeed = value);
+    }
+
+    public get topEvaderSpeed() {
+        return this._topEvaderSpeed;
+    }
+
+    public set topEvaderSpeed(value: number) {
+        this._topEvaderSpeed = value;
+        this._evaders.forEach(p => p.vehicle.topSpeed = value);
+    }
+
+    public get captureDistance() {
+        return this._captureDistance;
+    }
+
+    public set captureDistance(value: number) {
+        this._captureDistance = value;
+    }
+
+    public get maxGameLength() {
+        return this._maxGameLength;
+    }
+
+    public set maxGameLength(value: number) {
+        this._maxGameLength = value;
+    }
+
     public spawnPursuer = (agent: IAgent, position: IPoint) => {
-        const vehicle = new Car(position, PURSUER_TOP_SPEED);
+        const vehicle = new Car(position, this.topPursuerSpeed);
         const driver = new Driver(agent, vehicle, this);
         this._physics.addParticle(vehicle);
         this._pursuers.push(driver);
     }
 
     public spawnEvader = (agent: IAgent, position: IPoint) => {
-        const vehicle = new Car(position, EVADER_TOP_SPEED);
+        const vehicle = new Car(position, this.topEvaderSpeed);
         const driver = new Driver(agent, vehicle, this);
         this._physics.addParticle(vehicle);
         this._evaders.push(driver);
@@ -68,14 +107,14 @@ export default class GameWorld implements IGameWorld, IUpdatable {
     }
 
     private checkWinConditions = () => {
-        if (this._gameLength >= MAX_GAME_LENGTH) {
+        if (this._currGameLength >= this.maxGameLength) {
             this._victory = Victory.EVADER_WIN;
             return;
         }
 
         for (const p of this.pursuers) {
             for (const e of this.evaders) {
-                if (p.position.dist(e.position) <= CAPTURE_DISTANCE) {
+                if (p.position.dist(e.position) <= this.captureDistance) {
                     this._victory = Victory.PURSUER_WIN;
                     return;
                 }

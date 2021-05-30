@@ -2,19 +2,20 @@ import IAgent from "../agency/IAgent";
 import IUpdatable from "./IUpdatable";
 import IGameWorld from "./IWorld";
 import IDrivableVehicle from "../motion/IDrivableVehicle";
+import Car from "../motion/Car";
 
 export default class Driver implements IUpdatable {
     private readonly _agent: IAgent;
-    private readonly _vehicle: IDrivableVehicle;
+    private readonly _vehicle: Car;
     private readonly _world: IGameWorld;
 
-    public constructor(agent: IAgent, vehicle: IDrivableVehicle, world: IGameWorld) {
+    public constructor(agent: IAgent, vehicle: Car, world: IGameWorld) {
         this._agent = agent;
         this._vehicle = vehicle;
         this._world = world;
     }
 
-    public get vehicle(): IDrivableVehicle {
+    public get vehicle(): Car {
         return this._vehicle;
     }
 
