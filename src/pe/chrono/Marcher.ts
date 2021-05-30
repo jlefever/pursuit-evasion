@@ -1,9 +1,9 @@
 import ITerrian from "../terrian/ITerrian";
 import MarchingPoint from "./MarchingPoint";
 import ArrayMesh from "../grid/ArrayMesh";
-import InsertionQueue from "../ads/InsertionQueue";
+import InsertionQueue from "../datastructures/InsertionQueue";
 import IPoint from "../geometry/IPoint";
-import IPriorityQueue from "../ads/IPriorityQueue";
+import IPriorityQueue from "../datastructures/IPriorityQueue";
 import IMesh from "../grid/IMesh";
 
 const {abs, min, pow, sqrt} = Math;
