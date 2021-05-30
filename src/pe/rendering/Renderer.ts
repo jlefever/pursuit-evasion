@@ -1,5 +1,5 @@
 import ITerrian from "../terrian/ITerrian";
-import IGameWorld from "../game/IWorld";
+import IGameWorld from "../game/IGameWorld";
 import TerrianRenderer from "./TerrianRenderer";
 import EvaderRenderer from "./EvaderRenderer";
 import GridLinesRenderer from "./GridLinesRenderer";

@@ -1,6 +1,6 @@
 import IAgent from "../agency/IAgent";
 import IUpdatable from "./IUpdatable";
-import IGameWorld from "./IWorld";
+import IGameWorld from "./IGameWorld";
 import IDrivableVehicle from "../motion/IDrivableVehicle";
 import Car from "../motion/Car";
 

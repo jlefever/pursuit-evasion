@@ -3,7 +3,7 @@ import Car from "../motion/Car";
 import ITerrian from "../terrian/ITerrian";
 import IPoint from "../geometry/IPoint";
 import IUpdatable from "./IUpdatable";
-import IGameWorld from "./IWorld";
+import IGameWorld from "./IGameWorld";
 import IAgent from "../agency/IAgent";
 import IPhysics from "./IPhysics";
 import Victory from "./Victory";
