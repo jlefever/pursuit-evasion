@@ -58,6 +58,10 @@ export default class Car implements IDrivable, IVehicle {
     public steerTo(angle: number) {
         this._heading = angle;
         this._velocity = this._velocity.rotateTo(angle);
+        
+        if (!this.velocity.isZero) {
+            this._velocity = this._velocity.scaleTo(this._topSpeed);
+        }
     }
 
     /**
