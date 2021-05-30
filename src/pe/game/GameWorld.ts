@@ -9,24 +9,28 @@ import IPhysics from "./IPhysics";
 import Victory from "./Victory";
 import GameDefaults from "./GameDefaults";
 
+type VictoryCallback = (victory: Victory) => void;
+
 export default class GameWorld implements IGameWorld, IUpdatable {
     private readonly _physics: IPhysics;
     private readonly _terrian: ITerrian;
     private readonly _pursuers: Driver[];
     private readonly _evaders: Driver[];
-    private _victory: Victory;
+    private _victory?: Victory;
+    private _victoryCallback?: VictoryCallback;
     private _currGameLength: number;
     private _topPursuerSpeed: number;
     private _topEvaderSpeed: number;
     private _captureDistance: number;
     private _maxGameLength: number;
     
-    public constructor(terrian: ITerrian, physics: IPhysics) {
+    public constructor(terrian: ITerrian, physics: IPhysics, victoryCallback?: VictoryCallback) {
         this._physics = physics
         this._terrian = terrian;
         this._pursuers = [];
         this._evaders = [];
-        this._victory = Victory.NOT_YET;
+        this._victory = undefined;
+        this._victoryCallback = victoryCallback;
         this._currGameLength = 0;
 
         this._topPursuerSpeed = GameDefaults.TOP_PURSUER_SPEED
@@ -85,6 +89,10 @@ export default class GameWorld implements IGameWorld, IUpdatable {
         this._maxGameLength = value;
     }
 
+    public set victoryCallback(value: VictoryCallback) {
+        this._victoryCallback = value;
+    }
+
     public spawnPursuer = (agent: IAgent, position: IPoint) => {
         const vehicle = new Car(position, this.topPursuerSpeed);
         const driver = new Driver(agent, vehicle, this);
@@ -100,6 +108,7 @@ export default class GameWorld implements IGameWorld, IUpdatable {
     }
 
     public update = () => {
+        this._currGameLength += 1;
         this._pursuers.forEach(a => a.update());
         this._evaders.forEach(a => a.update());
         this._physics.update();
@@ -109,6 +118,11 @@ export default class GameWorld implements IGameWorld, IUpdatable {
     private checkWinConditions = () => {
         if (this._currGameLength >= this.maxGameLength) {
             this._victory = Victory.EVADER_WIN;
+
+            if (this._victoryCallback) {
+                this._victoryCallback(this._victory);
+            }
+
             return;
         }
 
@@ -116,11 +130,17 @@ export default class GameWorld implements IGameWorld, IUpdatable {
             for (const e of this.evaders) {
                 if (p.position.dist(e.position) <= this.captureDistance) {
                     this._victory = Victory.PURSUER_WIN;
+
+                    if (this._victoryCallback) {
+                        this._victoryCallback(this._victory);
+                    }
+                    
                     return;
                 }
             }
         }
         
-        this._victory = Victory.NOT_YET;
+        // The game continues even after victory unless stopped by victoryCallback.
+        this._victory = undefined;
     }
 }

@@ -1,5 +1,6 @@
 import { h, Component, createRef, RefObject } from "preact";
 import GameDefaults from "../../pe/game/GameDefaults";
+import Victory from "../../pe/game/Victory";
 import GameOptions from "./GameOptions";
 import GameWindow from "./GameWindow";
 
@@ -10,6 +11,7 @@ interface GameState {
     topPursuerSpeed: number;
     captureDistance: number;
     maxGameLength: number;
+    victory?: Victory;
 }
 
 const DEFAULT_STATE = {
@@ -17,7 +19,8 @@ const DEFAULT_STATE = {
     topEvaderSpeed: GameDefaults.TOP_EVADER_SPEED,
     topPursuerSpeed: GameDefaults.TOP_PURSUER_SPEED,
     captureDistance: GameDefaults.CAPTURE_DISTANCE,
-    maxGameLength: GameDefaults.MAX_GAME_LENGTH
+    maxGameLength: GameDefaults.MAX_GAME_LENGTH,
+    victory: undefined
 };
 
 export default class Game extends Component<{}, GameState> {
@@ -54,6 +57,13 @@ export default class Game extends Component<{}, GameState> {
         this.setState({ maxGameLength: value });
     }
 
+    private victorFound = (value: Victory) => {
+        this.setState({ victory: value });
+
+        // Just pause the game when a winner is found.
+        this.setIsPlaying(false);
+    }
+
     public render() {
         const {
             isPlaying,
@@ -77,6 +87,7 @@ export default class Game extends Component<{}, GameState> {
                         topPursuerSpeed={topPursuerSpeed}
                         captureDistance={captureDistance}
                         maxGameLength={maxGameLength}
+                        victorFound={this.victorFound}
                     />
                 </div>
             </div>

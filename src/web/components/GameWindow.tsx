@@ -19,12 +19,15 @@ interface GameWindowProps {
     topPursuerSpeed: number;
     captureDistance: number;
     maxGameLength: number;
+    victory?: Victory;
+
+    // This is called when a winner is found.
+    victorFound: (victory: Victory) => void;
 }
 
 interface GameWindowState {
     frameRate: number;
     tickRate: number;
-    victory: Victory;
 }
 
 export default class GameWindow extends Component<GameWindowProps, GameWindowState> {
@@ -39,7 +42,7 @@ export default class GameWindow extends Component<GameWindowProps, GameWindowSta
         super(props);
         this._ref = createRef();
         this._ctx = null;
-        this.state = { frameRate: 0, tickRate: 0, victory: Victory.NOT_YET };
+        this.state = { frameRate: 0, tickRate: 0 };
 
         const terrian = new Terrian(props.numHCells, props.numVCells, props.width);
         const world = GameDefaults.createDefaultWorld(terrian);
@@ -51,8 +54,6 @@ export default class GameWindow extends Component<GameWindowProps, GameWindowSta
             if (!this._ctx) return;
             renderer.render(this._ctx, alpha);
         }, this.props.targetTickRate);
-
-        this.refresh.bind(this);
     }
 
     componentDidMount() {
@@ -62,8 +63,7 @@ export default class GameWindow extends Component<GameWindowProps, GameWindowSta
         this._timerId = setInterval(() => {
             this.setState({
                 frameRate: this._gameLoop.frameRate,
-                tickRate: this._gameLoop.tickRate,
-                victory: this._gameWorld.victory
+                tickRate: this._gameLoop.tickRate
             });
         }, 1000);
     }
@@ -77,7 +77,7 @@ export default class GameWindow extends Component<GameWindowProps, GameWindowSta
         this.refresh();
     }
 
-    refresh() {
+    refresh = () => {
         this._ctx = this._ref.current!.getContext("2d");
         this._gameLoop.isPlaying = this.props.isPlaying;
         this._gameLoop.targetTickRate = this.props.targetTickRate;
@@ -85,6 +85,7 @@ export default class GameWindow extends Component<GameWindowProps, GameWindowSta
         this._gameWorld.topPursuerSpeed = this.props.topPursuerSpeed;
         this._gameWorld.captureDistance = this.props.captureDistance;
         this._gameWorld.maxGameLength = this.props.maxGameLength;
+        this._gameWorld.victoryCallback = this.props.victorFound;
     }
 
     render() {
@@ -95,7 +96,6 @@ export default class GameWindow extends Component<GameWindowProps, GameWindowSta
             <canvas ref={this._ref} width={width} height={height}></canvas>
             <span class="pr-3 is-family-monospace">Frame Rate: {round(this.state.frameRate)}</span>
             <span class="pr-3 is-family-monospace">Tick Rate: {round(this.state.tickRate)}</span>
-            <span class="is-family-monospace">Victory: {this.state.victory}</span>
         </div>
     }
 }
