@@ -1,12 +1,11 @@
-type PreferedFn<T> = (a: T, b: T) => boolean;
-type EqualityFn<T> = (a: T, b: T) => boolean;
+type BooleanFn<T> = (a: T, b: T) => boolean;
 
 export default class Queue<T> {
     private readonly _arr: T[] = new Array();
-    private readonly _preferedFn: PreferedFn<T>;
-    private readonly _equalityFn: EqualityFn<T>;
+    private readonly _preferedFn: BooleanFn<T>;
+    private readonly _equalityFn: BooleanFn<T>;
 
-    constructor(prefered: PreferedFn<T>, equality: EqualityFn<T>) {
+    constructor(prefered: BooleanFn<T>, equality: BooleanFn<T>) {
         this._preferedFn = prefered;
         this._equalityFn = equality;
     }

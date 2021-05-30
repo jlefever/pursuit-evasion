@@ -1,40 +1,41 @@
 import FreqTimer from "./FreqTimer";
+import IGameLoop from "./IGameLoop";
 
 type UpdateFn = () => void;
 type RenderFn = (alpha: number) => void;
 
-export default class GameLoop {
+export default class GameLoop implements IGameLoop {
     private readonly _update: UpdateFn;
     private readonly _render: RenderFn;
     private _updateTimer: FreqTimer = new FreqTimer();
     private _renderTimer: FreqTimer = new FreqTimer();
     private _lastFrameId: number = 0;
-    private _targetUpdatesPerSecond: number = 0;
-    private _targetMsPerUpdate: number = 0;
+    private _targetTicksPerSecond: number = 0;
+    private _targetMsPerTick: number = 0;
     private _isPlaying: boolean = false;
     private _previous: number = 0;
     private _lag: number = 0;
 
-    public constructor(update: UpdateFn, render: RenderFn, targetUPS: number) {
+    public constructor(update: UpdateFn, render: RenderFn, targetTickRate: number) {
         this._update = update;
         this._render = render;
-        this.targetUps = targetUPS;
+        this.targetTickRate = targetTickRate;
     }
 
-    public get targetUps() {
-        return this._targetUpdatesPerSecond;
+    public get targetTickRate() {
+        return this._targetTicksPerSecond;
     }
 
-    public set targetUps(value: number) {
-        this._targetUpdatesPerSecond = value;
-        this._targetMsPerUpdate = 1000 / value;
+    public set targetTickRate(value: number) {
+        this._targetTicksPerSecond = value;
+        this._targetMsPerTick = 1000 / value;
     }
 
-    public get framesPerSecond() {
+    public get frameRate() {
         return this._renderTimer.hertz();
     }
 
-    public get updatesPerSecond() {
+    public get tickRate() {
         return this._updateTimer.hertz();
     }
 
@@ -42,7 +43,7 @@ export default class GameLoop {
         return this._isPlaying;
     }
 
-    public set playing(value: boolean) {
+    public set isPlaying(value: boolean) {
         if (value) {
             this.play();
         } else {
@@ -69,14 +70,14 @@ export default class GameLoop {
         this._previous = current;
         this._lag += elapsed;
 
-        while (this._lag >= this._targetMsPerUpdate) {
+        while (this._lag >= this._targetMsPerTick) {
             this._updateTimer.tick();
             this._update();
-            this._lag -= this._targetMsPerUpdate;
+            this._lag -= this._targetMsPerTick;
         }
 
         this._renderTimer.tick();
-        this._render(this._lag / this._targetMsPerUpdate);
+        this._render(this._lag / this._targetMsPerTick);
         this._lastFrameId = window.requestAnimationFrame(this.loop);
     }
 }

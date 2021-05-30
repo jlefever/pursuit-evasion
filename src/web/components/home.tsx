@@ -29,7 +29,7 @@ class Home extends Component<{}, HomeState> {
                     <div class="column is-three-quarters">
                         <div class="box">
                             {/* 962 x 592 */}
-                            <Game2 width={962} height={962} playing={this.state.playing} desiredUps={this.state.updatesPerSecond} />
+                            <Game2 width={962} numHCells={26} numVCells={26} playing={this.state.playing} desiredUps={this.state.updatesPerSecond} />
                         </div>
                         <div class="box">
                             <table class="table is-striped is-hoverable is-fullwidth">

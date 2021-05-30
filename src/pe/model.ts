@@ -1,6 +1,6 @@
-import FastMarcher from "./FastMarcher";
-import FmmPoint from "./FmmPoint";
-import Mesh from "./Mesh";
+import Marcher from "./Marcher";
+import MarchingPoint from "./MarchingPoint";
+import ArrayMesh from "./ArrayMesh";
 import Queue from "./Queue";
 
 const { acos, atan2, cos, PI, random, sin, sqrt } = Math;
@@ -100,9 +100,7 @@ interface Stroke {
     readonly lineWidth: number;
 }
 
-function addRadians(...rads: number[]) {
-    return rads.reduce((a, b) => a + b, 0) % (2 * PI);
-}
+
 
 function circle(pos: Vec2, radius: number): Path2D {
     const path = new Path2D();
@@ -449,7 +447,7 @@ function rgb(r: number, g: number, b: number) {
     return `rgb(${r},${g},${b})`;
 }
 
-function findMax(mesh: Mesh<FmmPoint>) {
+function findMax(mesh: ArrayMesh<MarchingPoint>) {
     let max = Number.NEGATIVE_INFINITY;
 
     mesh.forEach(p => {
@@ -460,7 +458,7 @@ function findMax(mesh: Mesh<FmmPoint>) {
     return max;
 }
 
-function drawMesh(ctx: Context, mesh: Mesh<FmmPoint>) {
+function drawMesh(ctx: Context, mesh: ArrayMesh<MarchingPoint>) {
     ctx.save();
 
     ctx.lineWidth = 0;
@@ -486,7 +484,7 @@ function drawMesh(ctx: Context, mesh: Mesh<FmmPoint>) {
     ctx.restore();
 }
 
-function mergeMeshs(a: Mesh<FmmPoint>, b: Mesh<FmmPoint>) {
+function mergeMeshs(a: ArrayMesh<MarchingPoint>, b: ArrayMesh<MarchingPoint>) {
     a.forEach(p1 => {
         const p2 = b.access(p1.i, p1.j);
 
@@ -539,8 +537,8 @@ class Board implements Updatable {
     public readonly width: number;
     public readonly height: number;
     public readonly grid: Grid;
-    private readonly _marcherE: FastMarcher;
-    private readonly _marcherP: FastMarcher;
+    private readonly _marcherE: Marcher;
+    private readonly _marcherP: Marcher;
 
     constructor(width: number, height: number) {
         this.width = width;
@@ -551,8 +549,8 @@ class Board implements Updatable {
         this.grid.setTerrian(10, 11);
         this.grid.setTerrian(10, 12);
 
-        this._marcherE = new FastMarcher({ width: this.width, height: this.height }, 37);
-        this._marcherP = new FastMarcher({ width: this.width, height: this.height }, 37);
+        this._marcherE = new Marcher({ width: this.width, height: this.height }, 37);
+        this._marcherP = new Marcher({ width: this.width, height: this.height }, 37);
 
         this.agents = [];
         // const eva = new CAgent(Vec2.car(250, 250), Vec2.pol(0, 2));

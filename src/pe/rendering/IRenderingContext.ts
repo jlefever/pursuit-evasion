@@ -1,0 +1,1 @@
+export default interface IRenderingContext extends CanvasRenderingContext2D { }
