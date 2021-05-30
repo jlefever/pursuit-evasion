@@ -1,5 +1,5 @@
-import ITerrianPoint from "../ITerrianPoint";
-import IMesh from "../IMesh";
+import ITerrianPoint from "../terrian/ITerrianPoint";
+import IMesh from "../grid/IMesh";
 import MeshRenderer from "./MeshRenderer";
 
 export default class TerrianRenderer<T extends ITerrianPoint> extends MeshRenderer<T> {
