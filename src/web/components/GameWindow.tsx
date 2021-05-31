@@ -5,6 +5,7 @@ import GameWorld from "../../pe/game/GameWorld";
 import Renderer from "../../pe/rendering/Renderer";
 import Victory from "../../pe/game/Victory";
 import GameDefaults from "../../pe/game/GameDefaults";
+import IRenderer from "../../pe/rendering/IRenderer";
 
 interface GameWindowProps {
     // Once set, changing these values will do nothing.
@@ -36,6 +37,7 @@ export default class GameWindow extends Component<GameWindowProps, GameWindowSta
     private _ctx: CanvasRenderingContext2D | null;
     private _gameLoop: GameLoop;
     private _gameWorld: GameWorld;
+    private _renderer: IRenderer;
     private _timerId?: any;
 
     constructor(props: GameWindowProps) {
@@ -48,6 +50,7 @@ export default class GameWindow extends Component<GameWindowProps, GameWindowSta
         const world = GameDefaults.createDefaultWorld(terrian);
         const renderer = new Renderer(world);
 
+        this._renderer = renderer;
         this._terrian = terrian;
         this._gameWorld = world;
         this._gameLoop = new GameLoop(world.update, (alpha) => {
@@ -58,6 +61,9 @@ export default class GameWindow extends Component<GameWindowProps, GameWindowSta
 
     componentDidMount() {
         this.refresh();
+
+        // Do one render just so something is on the screen, even when paused.
+        this._renderer.render(this._ctx!, 0);
 
         // Update our display of these values once a second
         this._timerId = setInterval(() => {
