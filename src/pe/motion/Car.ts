@@ -11,16 +11,18 @@ export default class Car implements IDrivable, IVehicle {
     private _velocity: Vector;
     private _topSpeed: number;
     private _heading: number;
+    private _radius: number;
 
     /**
      * @param position The initial position of this vehicle.
      * @param topSpeed The maximum speed this vehicle can travel.
      */
-    public constructor(position: IPoint, topSpeed: number) {
+    public constructor(position: IPoint, topSpeed: number, radius: number) {
         this._position = Vector.fromPoint(position);
         this._velocity = Vector.zero();
         this._topSpeed = topSpeed;
         this._heading = this._velocity.angle;
+        this._radius = radius;
     }
 
     public get position() {
@@ -49,6 +51,10 @@ export default class Car implements IDrivable, IVehicle {
 
     public get heading() {
         return this._heading;
+    }
+
+    public get radius() {
+        return this._radius;
     }
 
     /**

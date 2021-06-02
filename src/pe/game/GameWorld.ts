@@ -94,16 +94,16 @@ export default class GameWorld implements IGameWorld, IUpdatable {
     }
 
     public spawnPursuer = (agent: IAgent, position: IPoint) => {
-        const vehicle = new Car(position, this.topPursuerSpeed);
+        const vehicle = new Car(position, this.topPursuerSpeed, 15);
         const driver = new Driver(agent, vehicle, this);
-        this._physics.addParticle(vehicle);
+        this._physics.addVehicle(vehicle);
         this._pursuers.push(driver);
     }
 
     public spawnEvader = (agent: IAgent, position: IPoint) => {
-        const vehicle = new Car(position, this.topEvaderSpeed);
+        const vehicle = new Car(position, this.topEvaderSpeed, 15);
         const driver = new Driver(agent, vehicle, this);
-        this._physics.addParticle(vehicle);
+        this._physics.addVehicle(vehicle);
         this._evaders.push(driver);
     }
 

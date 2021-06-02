@@ -13,4 +13,10 @@ export default interface IVehicle extends IParticle {
      * The angle this vehicle is currently facing.
      */
     readonly heading: number;
+
+    /**
+     * The radius of this vehicle's bounding circle. The origin
+     * of the circle is this vehicle's position.
+     */
+    readonly radius: number;
 }

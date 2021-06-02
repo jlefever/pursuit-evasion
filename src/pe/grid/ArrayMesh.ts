@@ -17,21 +17,15 @@ export default class ArrayMesh<T extends IMeshPoint> extends ArrayGrid<T> implem
         return this._stepSize;
     }
 
-    public getI = (x: number) => ArrayMesh.indexFor(this.stepSize, x);
+    public getI = (x: number) => x / this.stepSize | 0;
 
-    public getJ = (y: number) => ArrayMesh.indexFor(this.stepSize, y);
+    public getJ = (y: number) => y / this.stepSize | 0;
 
     public getX = (i: number) => this.stepSize * i;
 
     public getY = (j: number) => this.stepSize * j;
 
     public getBounds = (i: number, j: number) => ArrayMesh.boundsFor(this.stepSize, i, j);
-
-    private static indexFor = (step: number, z: number) => {
-        const initial = (z / step) | 0;
-        const offset = (z % step) / (0.5 * step) | 0
-        return initial + offset;
-    }
 
     private static boundsFor = (stepSize: number, i: number, j: number) => {
         const x = stepSize * i;

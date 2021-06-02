@@ -1,6 +1,6 @@
 import IUpdatable from "./IUpdatable";
-import IParticle from "../motion/IParticle";
+import IVehicle from "../motion/IVehicle";
 
 export default interface IPhysics extends IUpdatable {
-    readonly addParticle: (particle: IParticle) => void;
+    readonly addVehicle: (vehicle: IVehicle) => void;
 }

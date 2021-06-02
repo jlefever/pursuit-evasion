@@ -1,5 +1,6 @@
+import IPoint from "../geometry/IPoint";
 import Vector from "../geometry/Vector";
-import IParticle from "../motion/IParticle";
+import IVehicle from "../motion/IVehicle";
 import ITerrian from "../terrian/ITerrian";
 import IPhysics from "./IPhysics";
 
@@ -8,26 +9,35 @@ import IPhysics from "./IPhysics";
  */
 export default class Physics implements IPhysics {
     private readonly _terrian: ITerrian;
-    private readonly _particles: IParticle[];
+    private readonly _vehicles: IVehicle[];
 
     public constructor(terrian: ITerrian) {
         this._terrian = terrian;
-        this._particles = new Array();
+        this._vehicles = new Array();
     }
 
-    public addParticle(particle: IParticle) {
-        this._particles.push(particle);
+    public addVehicle(vehicle: IVehicle) {
+        this._vehicles.push(vehicle);
     }
 
     public update = () => {
-        this._particles.forEach(p => {
+        this._vehicles.forEach(p => {
             const desiredPos = p.position.add(p.velocity);
 
-            if (this._terrian.isLegalPoint(desiredPos.x ,desiredPos.y)) {
+            if (this.isLegalCircle(desiredPos.x, desiredPos.y, p.radius)) {
                 p.position = desiredPos;
             } else {
                 p.velocity = Vector.zero();
             }
         });
+    }
+
+    private isLegalCircle = (x: number, y: number, radius: number) => {
+        return this.isLegal(x - radius, y) && this.isLegal(x + radius, y)
+            && this.isLegal(x, y - radius) && this.isLegal(x, y + radius);
+    }
+
+    private isLegal = (x: number, y: number) => {
+        return this._terrian.isLegalPoint(x, y);
     }
 }
