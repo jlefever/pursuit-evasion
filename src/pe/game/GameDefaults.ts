@@ -1,4 +1,5 @@
 import GreedyChronoAgent from "../agency/GreedyChronoAgent";
+import KeyboardInputAgent from "../agency/KeyboardInputAgent";
 import RandomAgent from "../agency/RandomAgent";
 import Terrian from "../terrian/Terrian";
 import GameWorld from "./GameWorld";
@@ -30,7 +31,7 @@ export default class GameDefaults {
         world.spawnEvader(new RandomAgent(), { x: 100, y: 200 });
         world.spawnEvader(new RandomAgent(), { x: 100, y: 200 });
         world.spawnPursuer(new RandomAgent(), { x: 100, y: 200 });
-        world.spawnPursuer(new RandomAgent(), { x: 100, y: 200 });
+        world.spawnPursuer(new KeyboardInputAgent(), { x: 100, y: 200 });
         // world.spawnPursuer(new GreedyChronoAgent(terrian), { x: 700, y: 500 });
 
         return world;
