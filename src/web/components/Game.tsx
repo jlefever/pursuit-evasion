@@ -16,7 +16,7 @@ interface GameState {
 }
 
 const DEFAULT_STATE = {
-    targetTickRate: 40,
+    targetTickRate: 20,
     topEvaderSpeed: GameDefaults.TOP_EVADER_SPEED,
     topPursuerSpeed: GameDefaults.TOP_PURSUER_SPEED,
     captureDistance: GameDefaults.CAPTURE_DISTANCE,

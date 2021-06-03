@@ -3,7 +3,6 @@ import MarchingPoint from "./MarchingPoint";
 import ArrayMesh from "../grid/ArrayMesh";
 import InsertionQueue from "../datastructures/InsertionQueue";
 import IPoint from "../geometry/IPoint";
-import IPriorityQueue from "../datastructures/IPriorityQueue";
 import IMesh from "../grid/IMesh";
 
 const {abs, min, pow, sqrt} = Math;
@@ -12,7 +11,7 @@ const sq = (z: number) => pow(z, 2);
 export default class Marcher {
     private readonly _terrian: ITerrian;
     private readonly _mesh: IMesh<MarchingPoint>;
-    private readonly _queue: IPriorityQueue<MarchingPoint>;
+    private readonly _queue: InsertionQueue<MarchingPoint>;
 
     constructor(terrian: ITerrian) {
         this._terrian = terrian;
@@ -36,6 +35,10 @@ export default class Marcher {
             const min = this._queue.pop()!;
             min.accept();
             this._queue.push(...this.step(min, speed));
+
+            // Absolute hack. You shouldn't have to resort the queue like this.
+            // But we modify the ttr value after it is already in the queue.
+            this._queue.resort();
         }
     }
 
@@ -57,8 +60,7 @@ export default class Marcher {
 
         // Full update
         const underRad = sq(uH + uV) - (2 * (sq(uH) + sq(uV) - sq(time)));
-        return ((uH + uV) / 2) + (0.5 * sqrt(underRad));
-        // return 0.5 * (uH + uV + sqrt(underRad));
+        return 0.5 * (uH + uV + sqrt(underRad));
     }
 
     private getLegalNeighbors = (p: MarchingPoint) => {

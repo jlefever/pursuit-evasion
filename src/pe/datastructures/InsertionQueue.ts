@@ -32,4 +32,8 @@ export default class InsertionQueue<T> implements IPriorityQueue<T> {
 
         this._arr.push(e);
     }
+
+    public resort = () => {
+        this._arr.sort((a, b) => this._preferedFn(a, b) ? 1 : -1);
+    }
 }
