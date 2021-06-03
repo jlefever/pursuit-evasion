@@ -6,6 +6,7 @@ import GridLinesRenderer from "./GridLinesRenderer";
 import IRenderer from "./IRenderer";
 import IRenderingContext from "./IRenderingContext";
 import PursuerRenderer from "./PursuerRenderer";
+import ChronoMeshRenderer from "./ChronoMeshRenderer";
 
 export default class Renderer {
     private readonly _terrian: ITerrian;
@@ -16,6 +17,7 @@ export default class Renderer {
         const renderers = new Array<IRenderer>();
         const { numHCells, numVCells, cellSize } = world.terrian;
         renderers.push(new GridLinesRenderer(numHCells, numVCells, cellSize));
+        renderers.push(new ChronoMeshRenderer(world.chronoMesh));
         renderers.push(new TerrianRenderer(world.terrian.mesh));
         renderers.push(...world.pursuers.map(p => new PursuerRenderer(p)));
         renderers.push(...world.evaders.map(e => new EvaderRenderer(e)));

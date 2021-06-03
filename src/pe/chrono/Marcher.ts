@@ -24,11 +24,13 @@ export default class Marcher {
         return this._mesh;
     }
 
-    public march = (start: IPoint, speed: number) => {
+    public march = (origins: IPoint[], speed: number) => {
         this._mesh.reset();
-        const init = this._mesh.getOrCreate(this._mesh.getI(start.x), this._mesh.getJ(start.y));
-        init.consider(0);
-        this._queue.push(init);
+        origins.forEach(o => {
+            const init = this._mesh.getOrCreate(this._mesh.getI(o.x), this._mesh.getJ(o.y));
+            init.consider(0);
+            this._queue.push(init);
+        });
 
         while(!this._queue.isEmpty()) {
             const min = this._queue.pop()!;
@@ -54,8 +56,9 @@ export default class Marcher {
         if (abs(uH - uV) > time) return min(uH, uV) + time;
 
         // Full update
-        const underRad = sq(uH + uV) - 2 * (sq(uH) + sq(uV) - sq(time));
-        return 0.5 * (uH + uV + sqrt(underRad));
+        const underRad = sq(uH + uV) - (2 * (sq(uH) + sq(uV) - sq(time)));
+        return ((uH + uV) / 2) + (0.5 * sqrt(underRad));
+        // return 0.5 * (uH + uV + sqrt(underRad));
     }
 
     private getLegalNeighbors = (p: MarchingPoint) => {

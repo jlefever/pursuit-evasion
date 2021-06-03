@@ -21,6 +21,7 @@ interface GameWindowProps {
     captureDistance: number;
     maxGameLength: number;
     victory?: Victory;
+    showChronoMap: boolean
 
     // This is called when a winner is found.
     victorFound: (victory: Victory) => void;
@@ -92,6 +93,7 @@ export default class GameWindow extends Component<GameWindowProps, GameWindowSta
         this._gameWorld.captureDistance = this.props.captureDistance;
         this._gameWorld.maxGameLength = this.props.maxGameLength;
         this._gameWorld.victoryCallback = this.props.victorFound;
+        this._gameWorld.isUpdatingChronoMap = this.props.showChronoMap;
     }
 
     render() {

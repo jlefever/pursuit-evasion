@@ -8,6 +8,7 @@ import IAgent from "../agency/IAgent";
 import IPhysics from "./IPhysics";
 import Victory from "./Victory";
 import GameDefaults from "./GameDefaults";
+import ChronoMap from "./ChronoMap";
 
 type VictoryCallback = (victory: Victory) => void;
 
@@ -19,10 +20,12 @@ export default class GameWorld implements IGameWorld, IUpdatable {
     private _victory?: Victory;
     private _victoryCallback?: VictoryCallback;
     private _currGameLength: number;
+    private _chronoMap: ChronoMap;
     private _topPursuerSpeed: number;
     private _topEvaderSpeed: number;
     private _captureDistance: number;
     private _maxGameLength: number;
+    private _isUpdatingChronoMap: boolean;
     
     public constructor(terrian: ITerrian, physics: IPhysics, victoryCallback?: VictoryCallback) {
         this._physics = physics
@@ -32,11 +35,13 @@ export default class GameWorld implements IGameWorld, IUpdatable {
         this._victory = undefined;
         this._victoryCallback = victoryCallback;
         this._currGameLength = 0;
+        this._chronoMap = new ChronoMap(terrian, this._evaders, this._pursuers);
 
         this._topPursuerSpeed = GameDefaults.TOP_PURSUER_SPEED
         this._topEvaderSpeed = GameDefaults.TOP_EVADER_SPEED;
         this._captureDistance = GameDefaults.CAPTURE_DISTANCE;
         this._maxGameLength = GameDefaults.MAX_GAME_LENGTH;
+        this._isUpdatingChronoMap = false;
     }
 
     public get terrian() {
@@ -93,6 +98,21 @@ export default class GameWorld implements IGameWorld, IUpdatable {
         this._victoryCallback = value;
     }
 
+    public get isUpdatingChronoMap() {
+        return this._isUpdatingChronoMap;
+    }
+
+    public set isUpdatingChronoMap(value: boolean) {
+        if (this._isUpdatingChronoMap && !value) {
+            this._chronoMap.mesh.reset();
+        }
+        this._isUpdatingChronoMap = value;
+    }
+
+    public get chronoMesh() {
+        return this._chronoMap.mesh;
+    }
+
     public spawnPursuer = (agent: IAgent, position: IPoint) => {
         const vehicle = new Car(position, this.topPursuerSpeed, 15);
         const driver = new Driver(agent, vehicle, this);
@@ -112,7 +132,11 @@ export default class GameWorld implements IGameWorld, IUpdatable {
         this._pursuers.forEach(a => a.update());
         this._evaders.forEach(a => a.update());
         this._physics.update();
-        this.checkWinConditions();
+        // this.checkWinConditions();
+
+        if (this.isUpdatingChronoMap) {
+            this._chronoMap.update();
+        }
     }
 
     private checkWinConditions = () => {

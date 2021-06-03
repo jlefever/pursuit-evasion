@@ -12,6 +12,7 @@ interface GameState {
     captureDistance: number;
     maxGameLength: number;
     victory?: Victory;
+    showChronoMap: boolean;
 }
 
 const DEFAULT_STATE = {
@@ -20,7 +21,8 @@ const DEFAULT_STATE = {
     topPursuerSpeed: GameDefaults.TOP_PURSUER_SPEED,
     captureDistance: GameDefaults.CAPTURE_DISTANCE,
     maxGameLength: GameDefaults.MAX_GAME_LENGTH,
-    victory: undefined
+    victory: undefined,
+    showChronoMap: false
 };
 
 export default class Game extends Component<{}, GameState> {
@@ -64,6 +66,10 @@ export default class Game extends Component<{}, GameState> {
         this.setIsPlaying(false);
     }
 
+    private setShowChronoMap = (value: boolean) => {
+        this.setState({ showChronoMap: value });
+    }
+
     public render() {
         const {
             isPlaying,
@@ -71,7 +77,8 @@ export default class Game extends Component<{}, GameState> {
             topEvaderSpeed,
             topPursuerSpeed,
             captureDistance,
-            maxGameLength
+            maxGameLength,
+            showChronoMap
         } = this.state;
 
         return <div class="columns">
@@ -88,6 +95,7 @@ export default class Game extends Component<{}, GameState> {
                         captureDistance={captureDistance}
                         maxGameLength={maxGameLength}
                         victorFound={this.victorFound}
+                        showChronoMap={showChronoMap}
                     />
                 </div>
             </div>
@@ -99,6 +107,7 @@ export default class Game extends Component<{}, GameState> {
                     topPursuerSpeed={topPursuerSpeed}
                     captureDistance={captureDistance}
                     maxGameLength={maxGameLength}
+                    showChronoMap={showChronoMap}
 
                     setIsPlaying={this.setIsPlaying}
                     setTargetTickRate={this.setTargetTickRate}
@@ -107,6 +116,7 @@ export default class Game extends Component<{}, GameState> {
                     setCaptureDistance={this.setCaptureDistance}
                     setMaxGameLength={this.setMaxGameLength}
                     resetToDefaults={this.resetToDefaults}
+                    setShowChronoMap={this.setShowChronoMap}
                 />
             </div>
         </div>

@@ -1,27 +1,22 @@
 import IMesh from "../grid/IMesh";
-import IChronoPoint from "../chrono/IChronoPoint";
 import MeshRenderer from "./MeshRenderer";
+import ITeamChronoPoint from "../game/ITeamChronoPoint";
+import Team from "../game/Team";
 
-export default class ChronoMeshRenderer<T extends IChronoPoint> extends MeshRenderer<T> {
-    private _maxTtr?: number;
-
+export default class ChronoMeshRenderer<T extends ITeamChronoPoint> extends MeshRenderer<T> {
     constructor(mesh: IMesh<T>) {
         super(mesh);
     }
 
     public getBoundsColor = (p: T) => {
-        if (!this._maxTtr) return "yellow"; // error
-        const scale = p.ttr / this._maxTtr;
-        return `rgb(${scale * 127}, 0, 0)`;
+        if (p.team == Team.EVADERS) {
+            return "rgb(0, 0, 255, 0.5)";
+        } else if (p.team == Team.PURSUERS) {
+            return "rgb(255, 0, 0, 0.5)";
+        } else {
+            return "rgb(0, 0, 0, 0)";
+        }
     }
 
-    public beforeRender = () => {
-        this._maxTtr = Number.NEGATIVE_INFINITY;
-
-        this.mesh.forEach(p => {
-            if (p.ttr > this._maxTtr!) {
-                this._maxTtr = p.ttr;
-            }
-        });
-    }
+    public beforeRender = () => { }
 }

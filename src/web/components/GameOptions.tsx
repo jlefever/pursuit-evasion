@@ -9,6 +9,7 @@ interface GameOptionsProps {
     topPursuerSpeed: number;
     captureDistance: number;
     maxGameLength: number;
+    showChronoMap: boolean;
 
     setIsPlaying: (value: boolean) => void;
     setTargetTickRate: (value: number) => void;
@@ -16,6 +17,7 @@ interface GameOptionsProps {
     setTopPursuerSpeed: (value: number) => void;
     setCaptureDistance: (value: number) => void;
     setMaxGameLength: (value: number) => void;
+    setShowChronoMap: (value: boolean) => void;
     resetToDefaults: () => void;
 }
 
@@ -64,6 +66,18 @@ const comp: FunctionalComponent<GameOptionsProps> = (props: GameOptionsProps) =>
                 <div class="field">
                     <label class="label has-text-weight-light">Max Game Length</label>
                     <Slider value={props.maxGameLength} setValue={props.setMaxGameLength} min={0} max={4000} step={1} />
+                </div>
+            </div>
+        </div>
+        <div class="panel-block">
+            <div style="width: 100%">
+                <div class="field">
+                    <label class="checkbox label has-text-weight-light">
+                        <input type="checkbox" checked={props.showChronoMap} onChange={e => {
+                            props.setShowChronoMap((e.target as HTMLInputElement).checked);
+                        }} />
+                        Show time-to-reach map
+                        </label>
                 </div>
             </div>
         </div>

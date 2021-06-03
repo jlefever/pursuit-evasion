@@ -13,7 +13,12 @@ export default class GameDefaults {
         const world = new GameWorld(terrian, new Physics(terrian));
 
         // Set obstacles
-        terrian.setObstacles([5, 5], [5, 6], [6, 6]);
+        // terrian.setObstacles([5, 5], [5, 6], [6, 6]);
+        const arr: Array<[number, number]> = [];
+        for (let i = 5; i <= terrian.numVCells - 5; i++) {
+            arr.push([10, i]);
+        }
+        terrian.setObstacles(...arr);
 
         // Add agents
         world.spawnEvader(new RandomAgent(), { x: 100, y: 100 });
