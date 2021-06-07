@@ -82,11 +82,11 @@ export default class Game extends Component<{}, GameState> {
         } = this.state;
 
         return <div class="columns">
-            <div class="column is-three-quarters">
+            <div class="column is-four-fifths">
                 <div class="box">
                     <GameWindow
-                        width={962}
-                        numHCells={26}
+                        width={1515}
+                        numHCells={40}
                         numVCells={26}
                         isPlaying={isPlaying}
                         targetTickRate={targetTickRate}

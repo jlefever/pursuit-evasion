@@ -139,7 +139,18 @@ export default class GameWorld implements IGameWorld, IUpdatable {
             // console.log(sum_of_ttrs[0]);
             // console.log(sum_of_ttrs[1]);
         }
+
+        if (this._currGameLength > this._maxGameLength) {
+            return Victory.EVADER_WIN;
+        }
+
+        if (this._evaders.every(e => e.agent.isCaptured())) {
+            return Victory.PURSUER_WIN;
+        }
+
+        return Victory.IN_PROGRESS;
     }
+
     private checkIfCaught = () => {
         for (const e in this._evaders) {
             for (const p in this._pursuers) {
@@ -148,33 +159,5 @@ export default class GameWorld implements IGameWorld, IUpdatable {
                 }
             }
         }
-    }
-    private checkWinConditions = () => {
-        if (this._currGameLength >= this.maxGameLength) {
-            this._victory = Victory.EVADER_WIN;
-
-            if (this._victoryCallback) {
-                this._victoryCallback(this._victory);
-            }
-
-            return;
-        }
-
-        for (const p of this.pursuers) {
-            for (const e of this.evaders) {
-                if (p.position.dist(e.position) <= this.captureDistance) {
-                    this._victory = Victory.PURSUER_WIN;
-
-                    if (this._victoryCallback) {
-                        this._victoryCallback(this._victory);
-                    }
-                    
-                    return;
-                }
-            }
-        }
-        
-        // The game continues even after victory unless stopped by victoryCallback.
-        this._victory = undefined;
     }
 }
