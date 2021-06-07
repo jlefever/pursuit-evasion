@@ -29,35 +29,101 @@ export default class RunawayAgent implements IAgent {
         }
         return closestEnemy;
     }
-    public static getAngleAway(me: IDrivableVehicle, enemy: IVehicle, angleToEnemy: number) {
+    public static getAngleAway(me: IDrivableVehicle, enemy: IVehicle, angleToEnemy: number, terrain: ITerrain) {
         // Used if the agent is against a wall (not a corner) and needs to run in a direction besides 180 degrees away
-        if (enemy.position.x <= me.position.x && enemy.position.y <= me.position.y) { // enemy is left and above me
-            angleToEnemy = angleToEnemy - 0.5 * Math.PI;
-        } else if (enemy.position.x <= me.position.x && enemy.position.y >= me.position.y) { //enemy is left and below me
-            angleToEnemy = angleToEnemy + 0.5 * Math.PI;
-        } else if (enemy.position.x >= me.position.x && enemy.position.y <= me.position.y) { // enemy is right and above me
-            angleToEnemy = angleToEnemy + 0.5 * Math.PI;
-        } else { // enemy is right and below me
-            angleToEnemy = angleToEnemy - 0.5 * Math.PI;
+        const myXPositionMesh = terrain.mesh.getI(me.position.x);
+        const myYPositionMesh = terrain.mesh.getJ(me.position.y);
+        if (!terrain.isLegalCell(myXPositionMesh - 1, myYPositionMesh) || !terrain.isLegalCell(myXPositionMesh + 1, myYPositionMesh)) {
+            if (enemy.position.x <= me.position.x && enemy.position.y <= me.position.y) { // enemy is left and above me
+                angleToEnemy = 0.5 * Math.PI;
+            } else if (enemy.position.x <= me.position.x && enemy.position.y >= me.position.y) { //enemy is left and below me
+                angleToEnemy = -0.5 * Math.PI;
+            } else if (enemy.position.x >= me.position.x && enemy.position.y <= me.position.y) { // enemy is right and above me
+                angleToEnemy = 0.5 * Math.PI;
+            } else { // enemy is right and below me
+                angleToEnemy = -0.5 * Math.PI;
+            }
+        } else if (!terrain.isLegalCell(myXPositionMesh, myYPositionMesh - 1) || !terrain.isLegalCell(myXPositionMesh, myYPositionMesh + 1)) {
+            if (enemy.position.x <= me.position.x && enemy.position.y <= me.position.y) { // enemy is left and above me
+                angleToEnemy = 0;
+            } else if (enemy.position.x <= me.position.x && enemy.position.y >= me.position.y) { //enemy is left and below me
+                angleToEnemy = 0;
+            } else if (enemy.position.x >= me.position.x && enemy.position.y <= me.position.y) { // enemy is right and above me
+                angleToEnemy = Math.PI;
+            } else { // enemy is right and below me
+                angleToEnemy = Math.PI;
+            }
         }
         return angleToEnemy;
     }
     public static isStuckInCorner(me: IDrivableVehicle, terrain: ITerrain) {
         const myXPositionMesh = terrain.mesh.getI(me.position.x);
         const myYPositionMesh = terrain.mesh.getJ(me.position.y);
-        let invalidDirectionsArr: number = 0;
-        for (let i = 0; i <= 1; i++) {
-            for (let j = 0; j <= 1; j++) {
-                if (!terrain.isLegalCell(myXPositionMesh + i, myYPositionMesh + j)) {
-                    invalidDirectionsArr += 1;
-                }
+        let validDirectionsArr: number = 0;
+        for (let i = -1; i <= 1; i++) {
+            if (!terrain.isLegalCell(myXPositionMesh + i, myYPositionMesh) && i != 0) {
+                validDirectionsArr += 1;
             }
         }
-        if (invalidDirectionsArr >= 2) {
+        for (let j = -1; j <= 1; j++) {
+            if (!terrain.isLegalCell(myXPositionMesh, myYPositionMesh + j) && j != 0) {
+                validDirectionsArr += 1;
+            }
+        }
+        if (validDirectionsArr >= 2) {
             return true;
         } else {
             return false;
         }
+    }
+    
+    public static isNextToWall(me: IDrivableVehicle, terrain: ITerrain) {
+        const myXPositionMesh = terrain.mesh.getI(me.position.x);
+        const myYPositionMesh = terrain.mesh.getJ(me.position.y);
+        for (let i = -1; i <= 1; i++) {
+            if (!terrain.isLegalCell(myXPositionMesh + i, myYPositionMesh) && i != 0) {
+                return true;
+            }
+        }
+        for (let j = -1; j <= 1; j++) {
+            if (!terrain.isLegalCell(myXPositionMesh, myYPositionMesh + j) && j != 0) {
+                return true;
+            }
+        }
+    }
+
+    public static getAngleFromCorner(me: IDrivableVehicle, enemy: IVehicle, terrain: ITerrain, angleToClosestEnemy: number) {
+        const myXPositionMesh = terrain.mesh.getI(me.position.x);
+        const myYPositionMesh = terrain.mesh.getJ(me.position.y);
+        let validDirectionsArr: Array<number> = [];
+        if (terrain.isLegalCell(myXPositionMesh - 1, myYPositionMesh)) {
+            validDirectionsArr.push(Math.PI);
+        } else if (terrain.isLegalCell(myXPositionMesh + 1, myYPositionMesh)) {
+            validDirectionsArr.push(0);
+        } else if (terrain.isLegalCell(myXPositionMesh, myYPositionMesh - 1)) {
+            validDirectionsArr.push(-0.5 * Math.PI);
+        } else if (terrain.isLegalCell(myXPositionMesh, myYPositionMesh + 1)) {
+            validDirectionsArr.push(0.5 * Math.PI);
+        } 
+        
+        let deltaX = Math.abs(me.position.x - enemy.position.x);
+        let deltaY = Math.abs(me.position.y - enemy.position.y);
+        let output = 0;
+        if (deltaX > deltaY) {
+            if (validDirectionsArr.includes(-0.5 * Math.PI)) {
+                output = -0.5 * Math.PI;
+            } else if (validDirectionsArr.includes(0.5 * Math.PI)) {
+                output = 0.5 * Math.PI;
+            }
+        } else if (deltaX < deltaY) {
+            if (validDirectionsArr.includes(0)) {
+                output = 0;
+            } else if (validDirectionsArr.includes(Math.PI)) {
+                output = Math.PI;
+            }
+        }
+        
+        return output;
     }
 
     public act = (me: IDrivableVehicle, perspective: IAgentPerspective) => {
@@ -68,29 +134,25 @@ export default class RunawayAgent implements IAgent {
             return;
         }
         if (this._actionCountdown == 0) {
+            this._actionCountdown = 10;
             const closestEnemy:IVehicle = RunawayAgent.getClosestEnemy(me, perspective.enemies);
             const angleToClosestEnemy = me.position.lookAt(closestEnemy.position).angle;
             let angleToGo:number = 0;
-            if (me.velocity.isZero) {
+            if (RunawayAgent.isNextToWall(me, perspective.terrain)) {
                 if (RunawayAgent.isStuckInCorner(me, perspective.terrain)) { // stuck in corner condition
-                    this._target = this.getRandomTarget(perspective.terrain);
-                    angleToGo = me.position.lookAt(this._target).angle;
+                    angleToGo = RunawayAgent.getAngleFromCorner(me, closestEnemy, perspective.terrain, angleToClosestEnemy);
                 } else { //against a wall condition
-                    angleToGo = RunawayAgent.getAngleAway(me, closestEnemy, angleToClosestEnemy);
+                    angleToGo = RunawayAgent.getAngleAway(me, closestEnemy, angleToClosestEnemy, perspective.terrain);
                 }
             } else { //all other cases, just run from the closest pursuer
                 angleToGo = angleToClosestEnemy + Math.PI;
             }
-
-            // const angle = me.position.lookAt(this._target).angle;
             me.steerTo(angleToGo);
-            me.gas();
+            me.gas(); 
+            this._actionCountdown -= 1;
         } else {
             me.gas();
             this._actionCountdown -= 1;
-            if (this._actionCountdown == -1) {
-                this._actionCountdown = 4;
-            }
         }
     }
     public wasCaught = () => {

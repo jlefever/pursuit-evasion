@@ -67,6 +67,6 @@ export default class ChronoMap implements IUpdatable {
             sum_pursuers_ttr += 1;
             point.ttr = p.ttr;
         });
-        return [sum_pursuers_ttr, sum_evaders_ttr];
+        return [sum_evaders_ttr, sum_pursuers_ttr];
     }
 }

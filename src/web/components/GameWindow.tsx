@@ -6,6 +6,7 @@ import Renderer from "../../pe/rendering/Renderer";
 import Victory from "../../pe/game/Victory";
 import GameDefaults from "../../pe/game/GameDefaults";
 import IRenderer from "../../pe/rendering/IRenderer";
+import {DQNTrainer} from "../../pe/game/DQNTrainer";
 
 interface GameWindowProps {
     // Once set, changing these values will do nothing.
@@ -50,11 +51,36 @@ export default class GameWindow extends Component<GameWindowProps, GameWindowSta
         const terrain = new Terrain(props.numHCells, props.numVCells, props.width);
         const world = GameDefaults.createDefaultWorld(terrain);
         const renderer = new Renderer(world);
+        
+        const episodes = 100;
+        let replayMemorySize = 1e4;
+        let height = props.numVCells - 2;
+        let dqnWidth = props.numHCells - 2;
+        let epsilonInitial = 1.0;
+        let epsilonFinal = 0.1;
+        let epsilonDecayEpisodes = episodes / 10;
+        let batchSize = 64;
+        let gamma = 0.99;
+        let learningRate = 1e-3;
+        let targetNetworkSyncRate = episodes / 1000;
+        let savePath = "./models/dqn";
+    
+        const dqnTrainer = new DQNTrainer({
+            replayBufferSize: replayMemorySize,
+            epsilonInit: epsilonInitial,
+            epsilonFinal: epsilonFinal,
+            epsilonDecayFrames: epsilonDecayEpisodes,
+            learningRate: learningRate,
+            height: height,
+            width: dqnWidth
+        });
+        dqnTrainer.setWorld(world);
+        dqnTrainer.setPursuers(world.pursuersObjects);
 
         this._renderer = renderer;
         this._terrain = terrain;
         this._gameWorld = world;
-        this._gameLoop = new GameLoop(world.update, (alpha) => {
+        this._gameLoop = new GameLoop(dqnTrainer.playStep, (alpha) => {
             if (!this._ctx) return;
             renderer.render(this._ctx, alpha);
         }, this.props.targetTickRate);

@@ -26,6 +26,7 @@ export default class GameWorld implements IGameWorld, IUpdatable {
     private _captureDistance: number;
     private _maxGameLength: number;
     private _isUpdatingChronoMap: boolean;
+    private _reward: number;
     
     public constructor(terrain: ITerrain, physics: IPhysics, victoryCallback?: VictoryCallback) {
         this._physics = physics
@@ -42,6 +43,7 @@ export default class GameWorld implements IGameWorld, IUpdatable {
         this._captureDistance = GameDefaults.CAPTURE_DISTANCE;
         this._maxGameLength = GameDefaults.MAX_GAME_LENGTH;
         this._isUpdatingChronoMap = false;
+        this._reward = 0;
     }
 
     public get terrain() {
@@ -55,7 +57,32 @@ export default class GameWorld implements IGameWorld, IUpdatable {
     public get evaders() {
         return this._evaders.map(a => a.vehicle);
     }
+    
+    public get evadersObjects() {
+        return this._evaders.map(a => a.agent);
+    }
+    public get pursuersObjects() {
+        return this._pursuers.map(a => a.agent);
+    }
 
+    public get reward () {
+        let output = this._reward;
+        for (let i = 0; i < this._evaders.length; i++) {
+            if (this._evaders[i].agent.isCaptured()) {
+                output += 1000;
+            }
+        }
+        return output;
+    }
+    public get numEvadersCaught () {
+        let caught = 0;
+        for (let i = 0; i < this._evaders.length; i++) {
+            if (this._evaders[i].agent.isCaptured()) {
+                caught += 1;
+            }
+        }
+        return caught;
+    }
     public get victory() {
         return this._victory;
     }
@@ -138,6 +165,7 @@ export default class GameWorld implements IGameWorld, IUpdatable {
             let sum_of_ttrs = this._chronoMap.update();
             // console.log(sum_of_ttrs[0]);
             // console.log(sum_of_ttrs[1]);
+            this._reward = sum_of_ttrs[1] - sum_of_ttrs[0];
         }
 
         if (this._currGameLength > this._maxGameLength) {

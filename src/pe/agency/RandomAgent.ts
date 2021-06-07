@@ -26,6 +26,7 @@ export default class RandomAgent implements IAgent {
         }
         // Only change actions everytime actionCountdown is 0. This is an assumption in DQNs that improves convergence.
         if (this._actionCountdown == 0) {
+            this._actionCountdown = 10;
             if (me.position.dist(this._target) < 10 || me.velocity.isZero) {
                 this._target = this.getRandomTarget(perspective.terrain);
             }
@@ -36,9 +37,6 @@ export default class RandomAgent implements IAgent {
         } else {
             me.gas();
             this._actionCountdown -= 1;
-            if (this._actionCountdown == -1) {
-                this._actionCountdown = 4;
-            }
         }
     }
     public wasCaught = () => {

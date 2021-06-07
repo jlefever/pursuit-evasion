@@ -12,6 +12,7 @@ export default class Terrain implements ITerrain {
     private readonly _mesh: IMesh<TerrainPoint>;
     private readonly _maxI: number;
     private readonly _maxJ: number;
+    public _obstacleCells: Array<[number,number]>;
 
     public constructor(numHCells: number, numVCells: number, width: number) {
         this._numHCells = numHCells;
@@ -22,10 +23,15 @@ export default class Terrain implements ITerrain {
         this._mesh = new ArrayMesh(TerrainPoint.create, this._cellSize);
         this._maxI = this._mesh.getI(width);
         this._maxJ = this._mesh.getJ(this._height);
+        this._obstacleCells = [];
     }
 
     public get width() {
         return this._width;
+    }
+    
+    public get obstacleCells () {
+        return this._obstacleCells;
     }
 
     public get height() {
@@ -65,6 +71,7 @@ export default class Terrain implements ITerrain {
         locations.forEach(loc => {
             const [i, j] = loc;
             this._mesh.getOrCreate(i, j).isObstacle = true;
+            this._obstacleCells.push([i,j]);
         });
     }
 }

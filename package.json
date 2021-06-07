@@ -23,9 +23,11 @@
   "dependencies": {
     "@tensorflow/tfjs": "^3.7.0",
     "elkjs": "^0.7.1",
+    "node-pre-gyp": "^0.17.0",
     "preact": "^10.3.1",
     "preact-render-to-string": "^5.1.4",
-    "preact-router": "^3.2.1"
+    "preact-router": "^3.2.1",
+    "shelljs": "^0.8.4"
   },
   "devDependencies": {
     "@types/enzyme": "^3.10.5",
@@ -48,5 +50,10 @@
       "<rootDir>/tests/__mocks__/browserMocks.ts",
       "<rootDir>/tests/__mocks__/setupTests.ts"
     ]
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false
   }
 }
