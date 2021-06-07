@@ -4,7 +4,7 @@ import IDrivableVehicle from "../motion/IDrivableVehicle";
 import ITerrain from "../terrain/ITerrain";
 import Vector from "../geometry/Vector";
 
-export default class RandomAgent implements IAgent {
+export default class DQNAgent implements IAgent {
     private _target: Vector;
     public _actionCountdown: number;
     public _isCaptured: boolean;
@@ -17,6 +17,15 @@ export default class RandomAgent implements IAgent {
     public isCaptured (): boolean {
         return this._isCaptured;
     }
+    
+    public wasCaught = () => {
+        this._isCaptured = true;
+    }
+    
+    private getRandomTarget(terrain: ITerrain): Vector {
+        return Vector.car(Math.random() * terrain.width, Math.random() * terrain.height);
+    }
+
     public act = (me: IDrivableVehicle, perspective: IAgentPerspective) => {
         // If I have reached my target or I am not moving (because I have
         // collided with something), then assign another another random taraget.
@@ -41,10 +50,5 @@ export default class RandomAgent implements IAgent {
             }
         }
     }
-    public wasCaught = () => {
-        this._isCaptured = true;
-    }
-    private getRandomTarget(terrain: ITerrain): Vector {
-        return Vector.car(Math.random() * terrain.width, Math.random() * terrain.height);
-    }
+
 }

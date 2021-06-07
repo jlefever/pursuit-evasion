@@ -1,18 +1,18 @@
 import IPoint from "../geometry/IPoint";
 import Vector from "../geometry/Vector";
 import IVehicle from "../motion/IVehicle";
-import ITerrian from "../terrian/ITerrian";
+import ITerrain from "../terrain/ITerrain";
 import IPhysics from "./IPhysics";
 
 /**
  * A 100% complete and realistic physics simulation.
  */
 export default class Physics implements IPhysics {
-    private readonly _terrian: ITerrian;
+    private readonly _terrain: ITerrain;
     private readonly _vehicles: IVehicle[];
 
-    public constructor(terrian: ITerrian) {
-        this._terrian = terrian;
+    public constructor(terrain: ITerrain) {
+        this._terrain = terrain;
         this._vehicles = new Array();
     }
 
@@ -38,6 +38,6 @@ export default class Physics implements IPhysics {
     }
 
     private isLegal = (x: number, y: number) => {
-        return this._terrian.isLegalPoint(x, y);
+        return this._terrain.isLegalPoint(x, y);
     }
 }

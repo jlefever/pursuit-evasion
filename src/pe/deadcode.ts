@@ -92,9 +92,9 @@
 //         this.height = height;
 //         this.grid = new Grid(Vec2.car(26, 26), width, height);
 
-//         this.grid.setTerrian(10, 10);
-//         this.grid.setTerrian(10, 11);
-//         this.grid.setTerrian(10, 12);
+//         this.grid.setTerrain(10, 10);
+//         this.grid.setTerrain(10, 11);
+//         this.grid.setTerrain(10, 12);
 
 //         this._marcherE = new Marcher({ width: this.width, height: this.height }, 37);
 //         this._marcherP = new Marcher({ width: this.width, height: this.height }, 37);
@@ -142,7 +142,7 @@
 
 //         // draw grid
 //         draw(ctx, this.grid.lines(), undefined, { strokeStyle: "#BDBDBD", lineWidth: 0.75 })
-//         draw(ctx, this.grid.terrian(), { fillStyle: "#808080" }, undefined);
+//         draw(ctx, this.grid.terrain(), { fillStyle: "#808080" }, undefined);
 
 //         // draw agents
 //         this.agents.forEach(a => {

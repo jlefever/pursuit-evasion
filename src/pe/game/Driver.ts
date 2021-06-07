@@ -14,13 +14,15 @@ export default class Driver implements IUpdatable {
         this._vehicle = vehicle;
         this._world = world;
     }
-
+    public get agent(): IAgent {
+        return this._agent;
+    }
     public get vehicle(): Car {
         return this._vehicle;
     }
 
     public update() {
-        const { evaders, pursuers, terrian } = this._world;
+        const { evaders, pursuers, terrain } = this._world;
 
         const eIndex = evaders.indexOf(this._vehicle);
         if (eIndex != -1) {
@@ -30,7 +32,7 @@ export default class Driver implements IUpdatable {
 
             // Let the agent act.
             const enemies = pursuers;
-            this._agent.act(this.vehicle, { terrian, friends, enemies })
+            this._agent.act(this.vehicle, { terrain, friends, enemies })
             return;
         }
 
@@ -42,7 +44,7 @@ export default class Driver implements IUpdatable {
 
             // Let the agent act.
             const enemies = evaders;
-            this._agent.act(this.vehicle, { terrian, friends, enemies })
+            this._agent.act(this.vehicle, { terrain, friends, enemies })
             return;
         }
 

@@ -1,5 +1,5 @@
 import { h, Component, createRef, RefObject } from "preact";
-import Terrian from "../../pe/terrian/Terrian";
+import Terrain from "../../pe/terrain/Terrain";
 import GameLoop from "../../pe/game/GameLoop";
 import GameWorld from "../../pe/game/GameWorld";
 import Renderer from "../../pe/rendering/Renderer";
@@ -34,7 +34,7 @@ interface GameWindowState {
 
 export default class GameWindow extends Component<GameWindowProps, GameWindowState> {
     private _ref: RefObject<HTMLCanvasElement>;
-    private _terrian: Terrian;
+    private _terrain: Terrain;
     private _ctx: CanvasRenderingContext2D | null;
     private _gameLoop: GameLoop;
     private _gameWorld: GameWorld;
@@ -47,12 +47,12 @@ export default class GameWindow extends Component<GameWindowProps, GameWindowSta
         this._ctx = null;
         this.state = { frameRate: 0, tickRate: 0 };
 
-        const terrian = new Terrian(props.numHCells, props.numVCells, props.width);
-        const world = GameDefaults.createDefaultWorld(terrian);
+        const terrain = new Terrain(props.numHCells, props.numVCells, props.width);
+        const world = GameDefaults.createDefaultWorld(terrain);
         const renderer = new Renderer(world);
 
         this._renderer = renderer;
-        this._terrian = terrian;
+        this._terrain = terrain;
         this._gameWorld = world;
         this._gameLoop = new GameLoop(world.update, (alpha) => {
             if (!this._ctx) return;
@@ -99,7 +99,7 @@ export default class GameWindow extends Component<GameWindowProps, GameWindowSta
     render() {
         const round = (num: number) => Math.round(num * 1000) / 1000;
 
-        const { width, height } = this._terrian;
+        const { width, height } = this._terrain;
         return <div>
             <canvas ref={this._ref} width={width} height={height}></canvas>
             <span class="pr-3 is-family-monospace">Frame Rate: {round(this.state.frameRate)}</span>

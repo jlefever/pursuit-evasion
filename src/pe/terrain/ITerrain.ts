@@ -1,8 +1,8 @@
-import ITerrianPoint from "./ITerrianPoint";
+import ITerrainPoint from "./ITerrainPoint";
 import IMesh from "../grid/IMesh";
 
-export default interface ITerrian {
-    readonly mesh: IMesh<ITerrianPoint>;
+export default interface ITerrain {
+    readonly mesh: IMesh<ITerrainPoint>;
     readonly width: number;
     readonly height: number;
     readonly numHCells: number;

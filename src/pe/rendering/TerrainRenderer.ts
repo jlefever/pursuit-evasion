@@ -1,8 +1,8 @@
-import ITerrianPoint from "../terrian/ITerrianPoint";
+import ITerrainPoint from "../terrain/ITerrainPoint";
 import IMesh from "../grid/IMesh";
 import MeshRenderer from "./MeshRenderer";
 
-export default class TerrianRenderer<T extends ITerrianPoint> extends MeshRenderer<T> {
+export default class TerrainRenderer<T extends ITerrainPoint> extends MeshRenderer<T> {
     constructor(mesh: IMesh<T>) {
         super(mesh);
     }

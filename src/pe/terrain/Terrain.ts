@@ -1,15 +1,15 @@
 import ArrayMesh from "../grid/ArrayMesh";
 import IMesh from "../grid/IMesh";
-import ITerrian from "./ITerrian";
-import TerrianPoint from "./TerrianPoint";
+import ITerrain from "./ITerrain";
+import TerrainPoint from "./TerrainPoint";
 
-export default class Terrian implements ITerrian {
+export default class Terrain implements ITerrain {
     private readonly _width: number;
     private readonly _height: number;
     private readonly _numHCells: number;
     private readonly _numVCells: number;
     private readonly _cellSize: number;
-    private readonly _mesh: IMesh<TerrianPoint>;
+    private readonly _mesh: IMesh<TerrainPoint>;
     private readonly _maxI: number;
     private readonly _maxJ: number;
 
@@ -19,7 +19,7 @@ export default class Terrian implements ITerrian {
         this._cellSize = (width / numHCells) | 0;
         this._width = width;
         this._height = this._cellSize * numVCells;
-        this._mesh = new ArrayMesh(TerrianPoint.create, this._cellSize);
+        this._mesh = new ArrayMesh(TerrainPoint.create, this._cellSize);
         this._maxI = this._mesh.getI(width);
         this._maxJ = this._mesh.getJ(this._height);
     }

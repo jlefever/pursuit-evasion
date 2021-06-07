@@ -21,6 +21,7 @@
     ]
   },
   "dependencies": {
+    "@tensorflow/tfjs": "^3.7.0",
     "elkjs": "^0.7.1",
     "preact": "^10.3.1",
     "preact-render-to-string": "^5.1.4",

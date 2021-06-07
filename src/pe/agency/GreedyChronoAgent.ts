@@ -5,19 +5,19 @@ import Vector from "../geometry/Vector";
 import Marcher from "../chrono/Marcher";
 import IChronoPoint from "../chrono/IChronoPoint";
 import IMesh from "../grid/IMesh";
-import ITerrian from "../terrian/ITerrian";
+import ITerrain from "../terrain/ITerrain";
 
 export default class GreedyChronoAgent implements IAgent {
     private readonly _enemiesMarcher: Marcher;
     private readonly _friendsMarcher: Marcher;
 
-    constructor(terrian: ITerrian) {
-        this._enemiesMarcher = new Marcher(terrian);
-        this._friendsMarcher = new Marcher(terrian);
+    constructor(terrain: ITerrain) {
+        this._enemiesMarcher = new Marcher(terrain);
+        this._friendsMarcher = new Marcher(terrain);
     }
 
     public act = (me: IDrivableVehicle, perspective: IAgentPerspective) => {
-        const { enemies, friends, terrian } = perspective;
+        const { enemies, friends, terrain } = perspective;
 
         if (enemies.length === 0) return;
 
@@ -40,7 +40,7 @@ export default class GreedyChronoAgent implements IAgent {
         const tryMoving = (dx: number, dy: number) => {
             const newPos = myPos.add(Vector.car(dx, dy));
 
-            if (!terrian.isLegalPoint(newPos.x, newPos.y)) {
+            if (!terrain.isLegalPoint(newPos.x, newPos.y)) {
                 return Vector.zero();
             }
             
@@ -50,7 +50,7 @@ export default class GreedyChronoAgent implements IAgent {
             return Vector.car(dx, dy).scaleTo(1).scale(newArea - baseArea);
         }
 
-        const step = terrian.cellSize;
+        const step = terrain.cellSize;
 
         const a = tryMoving(step, 0);
         const b = tryMoving(-step, 0);

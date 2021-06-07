@@ -1,4 +1,4 @@
-import ITerrian from "../terrian/ITerrian";
+import ITerrain from "../terrain/ITerrain";
 import MarchingPoint from "./MarchingPoint";
 import ArrayMesh from "../grid/ArrayMesh";
 import InsertionQueue from "../datastructures/InsertionQueue";
@@ -9,13 +9,13 @@ const {abs, min, pow, sqrt} = Math;
 const sq = (z: number) => pow(z, 2);
 
 export default class Marcher {
-    private readonly _terrian: ITerrian;
+    private readonly _terrain: ITerrain;
     private readonly _mesh: IMesh<MarchingPoint>;
     private readonly _queue: InsertionQueue<MarchingPoint>;
 
-    constructor(terrian: ITerrian) {
-        this._terrian = terrian;
-        this._mesh = new ArrayMesh<MarchingPoint>(MarchingPoint.create, terrian.cellSize);
+    constructor(terrain: ITerrain) {
+        this._terrain = terrain;
+        this._mesh = new ArrayMesh<MarchingPoint>(MarchingPoint.create, terrain.cellSize);
         this._queue = new InsertionQueue<MarchingPoint>(MarchingPoint.prefered, MarchingPoint.equality);
     }
 
@@ -65,10 +65,10 @@ export default class Marcher {
 
     private getLegalNeighbors = (p: MarchingPoint) => {
         const arr = new Array<MarchingPoint>();
-        if (this._terrian.isLegalCell(p.i - 1, p.j)) arr.push(this._mesh.getOrCreate(p.i - 1, p.j));
-        if (this._terrian.isLegalCell(p.i + 1, p.j)) arr.push(this._mesh.getOrCreate(p.i + 1, p.j));
-        if (this._terrian.isLegalCell(p.i, p.j - 1)) arr.push(this._mesh.getOrCreate(p.i, p.j - 1));
-        if (this._terrian.isLegalCell(p.i, p.j + 1)) arr.push(this._mesh.getOrCreate(p.i, p.j + 1));
+        if (this._terrain.isLegalCell(p.i - 1, p.j)) arr.push(this._mesh.getOrCreate(p.i - 1, p.j));
+        if (this._terrain.isLegalCell(p.i + 1, p.j)) arr.push(this._mesh.getOrCreate(p.i + 1, p.j));
+        if (this._terrain.isLegalCell(p.i, p.j - 1)) arr.push(this._mesh.getOrCreate(p.i, p.j - 1));
+        if (this._terrain.isLegalCell(p.i, p.j + 1)) arr.push(this._mesh.getOrCreate(p.i, p.j + 1));
         return arr;
     }
 }

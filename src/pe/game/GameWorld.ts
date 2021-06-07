@@ -1,6 +1,6 @@
 import Driver from "./Driver";
 import Car from "../motion/Car";
-import ITerrian from "../terrian/ITerrian";
+import ITerrain from "../terrain/ITerrain";
 import IPoint from "../geometry/IPoint";
 import IUpdatable from "./IUpdatable";
 import IGameWorld from "./IGameWorld";
@@ -14,7 +14,7 @@ type VictoryCallback = (victory: Victory) => void;
 
 export default class GameWorld implements IGameWorld, IUpdatable {
     private readonly _physics: IPhysics;
-    private readonly _terrian: ITerrian;
+    private readonly _terrain: ITerrain;
     private readonly _pursuers: Driver[];
     private readonly _evaders: Driver[];
     private _victory?: Victory;
@@ -27,15 +27,15 @@ export default class GameWorld implements IGameWorld, IUpdatable {
     private _maxGameLength: number;
     private _isUpdatingChronoMap: boolean;
     
-    public constructor(terrian: ITerrian, physics: IPhysics, victoryCallback?: VictoryCallback) {
+    public constructor(terrain: ITerrain, physics: IPhysics, victoryCallback?: VictoryCallback) {
         this._physics = physics
-        this._terrian = terrian;
+        this._terrain = terrain;
         this._pursuers = [];
         this._evaders = [];
         this._victory = undefined;
         this._victoryCallback = victoryCallback;
         this._currGameLength = 0;
-        this._chronoMap = new ChronoMap(terrian, this._evaders, this._pursuers);
+        this._chronoMap = new ChronoMap(terrain, this._evaders, this._pursuers);
 
         this._topPursuerSpeed = GameDefaults.TOP_PURSUER_SPEED
         this._topEvaderSpeed = GameDefaults.TOP_EVADER_SPEED;
@@ -44,8 +44,8 @@ export default class GameWorld implements IGameWorld, IUpdatable {
         this._isUpdatingChronoMap = false;
     }
 
-    public get terrian() {
-        return this._terrian;
+    public get terrain() {
+        return this._terrain;
     }
 
     public get pursuers() {
@@ -133,12 +133,22 @@ export default class GameWorld implements IGameWorld, IUpdatable {
         this._evaders.forEach(a => a.update());
         this._physics.update();
         // this.checkWinConditions();
-
+        this.checkIfCaught();
         if (this.isUpdatingChronoMap) {
-            this._chronoMap.update();
+            let sum_of_ttrs = this._chronoMap.update();
+            // console.log(sum_of_ttrs[0]);
+            // console.log(sum_of_ttrs[1]);
         }
     }
-
+    private checkIfCaught = () => {
+        for (const e in this._evaders) {
+            for (const p in this._pursuers) {
+                if (this._pursuers[p].vehicle.position.dist(this._evaders[e].vehicle.position) <= this.captureDistance) {
+                    this._evaders[e].agent.wasCaught();
+                }
+            }
+        }
+    }
     private checkWinConditions = () => {
         if (this._currGameLength >= this.maxGameLength) {
             this._victory = Victory.EVADER_WIN;

@@ -22,7 +22,7 @@ const DEFAULT_STATE = {
     captureDistance: GameDefaults.CAPTURE_DISTANCE,
     maxGameLength: GameDefaults.MAX_GAME_LENGTH,
     victory: undefined,
-    showChronoMap: false
+    showChronoMap: true
 };
 
 export default class Game extends Component<{}, GameState> {

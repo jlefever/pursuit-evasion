@@ -1,7 +1,7 @@
-import ITerrianPoint from "./ITerrianPoint";
+import ITerrainPoint from "./ITerrainPoint";
 import ISquare from "../geometry/ISquare";
 
-export default class TerrianPoint implements ITerrianPoint {
+export default class TerrainPoint implements ITerrainPoint {
     public readonly i: number;
     public readonly j: number;
     public readonly bounds: ISquare;
@@ -14,7 +14,7 @@ export default class TerrianPoint implements ITerrianPoint {
     }
 
     public static create(i: number, j: number, bounds: ISquare) {
-        return new TerrianPoint(i, j, bounds);
+        return new TerrainPoint(i, j, bounds);
     }
 
     public reset = () => this.isObstacle = false;

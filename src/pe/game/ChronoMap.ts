@@ -1,7 +1,7 @@
 import Marcher from "../chrono/Marcher";
 import ArrayMesh from "../grid/ArrayMesh";
 import IMesh from "../grid/IMesh";
-import ITerrian from "../terrian/ITerrian";
+import ITerrain from "../terrain/ITerrain";
 import Driver from "./Driver";
 import ITeamChronoPoint from "./ITeamChronoPoint";
 import IUpdatable from "./IUpdatable";
@@ -15,10 +15,10 @@ export default class ChronoMap implements IUpdatable {
     private readonly _evaders: Driver[];
     private readonly _pursuers: Driver[];
 
-    public constructor(terrian: ITerrian, evaders: Driver[], pursuers: Driver[]) {
-        this._marcherE = new Marcher(terrian);
-        this._marcherP = new Marcher(terrian);
-        this._mesh = new ArrayMesh<ITeamChronoPoint>(TeamChronoPoint.create, terrian.cellSize);
+    public constructor(terrain: ITerrain, evaders: Driver[], pursuers: Driver[]) {
+        this._marcherE = new Marcher(terrain);
+        this._marcherP = new Marcher(terrain);
+        this._mesh = new ArrayMesh<ITeamChronoPoint>(TeamChronoPoint.create, terrain.cellSize);
         this._evaders = evaders;
         this._pursuers = pursuers;
     }
@@ -28,9 +28,13 @@ export default class ChronoMap implements IUpdatable {
     }
 
     public update = () => {
+        var sum_pursuers_ttr = 0;
+        var sum_evaders_ttr = 0;
+
         if (this._evaders.length > 0) {
             const speed = this._evaders[0].vehicle.topSpeed;
-            const origins = this._evaders.map(e => e.vehicle.position);
+            let filtered_evaders = this._evaders.filter(c => c.agent.isCaptured() == false)
+            const origins = filtered_evaders.map(e => e.vehicle.position);
             this._marcherE.march(origins, speed);
         }
 
@@ -47,6 +51,7 @@ export default class ChronoMap implements IUpdatable {
             const point = this._mesh.getOrCreate(p.i, p.j);
             if (point.ttr < p.ttr) return;
             point.team = Team.EVADERS;
+            sum_evaders_ttr += 1;
             point.ttr = p.ttr;
         });
 
@@ -59,7 +64,9 @@ export default class ChronoMap implements IUpdatable {
             }
             if (point.ttr < p.ttr) return;
             point.team = Team.PURSUERS;
+            sum_pursuers_ttr += 1;
             point.ttr = p.ttr;
         });
+        return [sum_pursuers_ttr, sum_evaders_ttr];
     }
 }
